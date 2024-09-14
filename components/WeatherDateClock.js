@@ -43,7 +43,7 @@ const WeatherDateClock = () => {
           <FaCalendarAlt className="mr-1 text-blue-500 dark:text-blue-400" size={12} />
           <span className="text-xs font-medium">{formatDate(date)}</span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center mb-1">
           <FaClock className="mr-1 text-blue-500 dark:text-blue-400" size={12} />
           <span className="text-sm font-bold">
             {formatTime(date)} <span className="text-xs font-normal ml-1">CT</span>

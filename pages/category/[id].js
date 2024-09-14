@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head'
 import Sidebar from '../../components/Sidebar'
 import PostCard from '../../components/PostCard'
@@ -16,16 +17,31 @@ const categorySubheadings = {
   home: "Welcome to my personal website",
 };
 
-export default function Category({ category, initialPosts, categories }) {
+export default function Category({ initialCategory, initialPosts, categories }) {
+  const router = useRouter();
+  const [category, setCategory] = useState(initialCategory);
   const [posts, setPosts] = useState(initialPosts);
   const [activeTag, setActiveTag] = useState(null);
 
+  useEffect(() => {
+    if (router.query.id) {
+      const newCategory = categories.find(c => c.id === router.query.id);
+      if (newCategory) {
+        setCategory(newCategory.name);
+        setPosts(initialPosts.filter(post => post.category.toLowerCase() === router.query.id.toLowerCase()));
+        setActiveTag(null);
+      }
+    }
+  }, [router.query.id, categories, initialPosts]);
+
   const handleTagClick = (tag) => {
     if (activeTag === tag) {
-      setPosts(initialPosts);
+      setPosts(initialPosts.filter(post => post.category.toLowerCase() === router.query.id.toLowerCase()));
       setActiveTag(null);
     } else {
-      const filteredPosts = initialPosts.filter(post => post.tags.includes(tag));
+      const filteredPosts = initialPosts.filter(post => 
+        post.category.toLowerCase() === router.query.id.toLowerCase() && post.tags.includes(tag)
+      );
       setPosts(filteredPosts);
       setActiveTag(tag);
     }
@@ -112,7 +128,7 @@ export async function getStaticProps({ params }) {
     };
   }
 
-  const posts = allPosts.filter((post) => {
+  const initialPosts = allPosts.filter((post) => {
     if (category.id === 'home') {
       return post.isHomePost;
     }
@@ -121,8 +137,8 @@ export async function getStaticProps({ params }) {
 
   return {
     props: {
-      category: category.name,
-      initialPosts: posts,
+      initialCategory: category.name,
+      initialPosts,
       categories,
     },
     revalidate: 60 * 5, // Regenerate the page every 5 minutes

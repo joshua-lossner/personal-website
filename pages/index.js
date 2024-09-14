@@ -5,7 +5,6 @@ import { getSortedPostsData } from '../lib/posts'
 import { getCategories } from '../utils/categories'
 import { FaTwitter, FaFacebook, FaLinkedin } from 'react-icons/fa';
 import { useState } from 'react';
-import WeatherDateClock from '../components/WeatherDateClock';
 
 export default function Home({ allPostsData = [], categories = [] }) {
   const [filteredPosts, setFilteredPosts] = useState(allPostsData);
@@ -87,12 +86,8 @@ export default function Home({ allPostsData = [], categories = [] }) {
         </div>
       </main>
 
-      {/* Right panel */}
-      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
-        <div className="mb-4">
-          <WeatherDateClock />
-        </div>
-        {/* Add other right panel content here */}
+      {/* Right panel - Empty */}
+      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10">
       </div>
     </div>
   )
