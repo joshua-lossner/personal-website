@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add any global styles here */
+
+.custom-article-typography {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+.custom-article-typography h1 {
+  @apply text-xl font-semibold mb-2 text-gray-900 dark:text-gray-200;
+}
+
+.custom-article-typography h2 {
+  @apply text-lg font-semibold mt-6 mb-2 text-gray-900 dark:text-gray-200;
+}
+
+.custom-article-typography h3 {
+  @apply text-base font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-200;
+}
+
+.custom-article-typography p,
+.custom-article-typography ul,
+.custom-article-typography ol {
+  @apply text-sm mb-4;
+}
+
+.custom-article-typography li {
+  @apply mb-2;
+}
+
+.card-content-enter {
+  max-height: 0;
+  opacity: 0;
+}
+
+.card-content-enter-active {
+  max-height: 5000px; /* Adjust this value based on your content */
+  opacity: 1;
+  transition: max-height 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+
+.card-content-exit {
+  max-height: 5000px; /* Adjust this value based on your content */
+  opacity: 1;
+}
+
+.card-content-exit-active {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 500ms ease-in-out, opacity 500ms ease-in-out;
+}
+
+/* Add this new class for a smoother height transition */
+.smooth-height-transition {
+  transition: max-height 500ms ease-in-out;
+  overflow: hidden;
+}
+
+.toggle-checkbox:checked {
+  @apply: right-0 border-green-400;
+  right: 0;
+  border-color: #68D391;
+}
+.toggle-checkbox:checked + .toggle-label {
+  @apply: bg-green-400;
+  background-color: #68D391;
+}
+
+/* Add these new styles */
+.compressed {
+  max-height: 20px;
+  overflow: hidden;
+  transition: all 1s ease-in-out;
+}
+
+.expanded {
+  max-height: 10000px; /* Adjust this value based on your maximum expected content height */
+  transition: all 1s ease-in-out;
+}
+
+/* Add these new styles for content positioning */
+.expanded .prose {
+  animation: slideDown 1s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-content {
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding-top 0.5s ease-in-out;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0;
+}
+
+.card-content.expanded {
+  opacity: 1;
+  padding-top: 1.5rem; /* This adds the extra space when expanded */
+}
+
+.expanded .card-summary {
+  opacity: 0.5;
+  transition: opacity 0.3s ease-in-out;
+}
