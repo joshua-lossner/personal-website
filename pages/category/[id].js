@@ -79,7 +79,7 @@ export default function Category({ initialCategory, initialPosts, categories }) 
           )}
         </div>
         <div className="flex-grow overflow-y-auto scrollbar-hide">
-          <div className="p-4 space-y-4 max-w-2xl mx-auto">
+          <div className="p-4 space-y-4 max-w-3xl mx-auto w-full"> {/* Updated this line */}
             {posts.map(({ id, date, title, subheading, category, description, content, pinned, tags }) => (
               <PostCard 
                 key={id} 

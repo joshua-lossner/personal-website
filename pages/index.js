@@ -65,21 +65,24 @@ export default function Home({ allPostsData = [], categories = [] }) {
             </div>
           )}
         </div>
-        <div className="p-4 space-y-4">
-          {filteredPosts.map((post) => (
-            <PostCard 
-              key={post.id} 
-              title={post.title}
-              subheading={post.subheading}
-              date={post.date} 
-              category={post.category} 
-              description={post.description} 
-              content={post.content}
-              pinned={post.pinned} 
-              tags={post.tags}
-              onTagClick={handleTagClick}
-            />
-          ))}
+        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full"> {/* Added max-w-3xl and mx-auto */}
+          {filteredPosts.map((post) => {
+            console.log('Post content:', post.title, post.content.substring(0, 100)); // Log the first 100 characters
+            return (
+              <PostCard 
+                key={post.id} 
+                title={post.title}
+                subheading={post.subheading}
+                date={post.date} 
+                category={post.category} 
+                description={post.description} 
+                content={post.content}
+                pinned={post.pinned} 
+                tags={post.tags}
+                onTagClick={handleTagClick}
+              />
+            );
+          })}
           {filteredPosts.length === 0 && (
             <p className="text-gray-600 dark:text-gray-400">No posts available.</p>
           )}

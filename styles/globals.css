@@ -23,7 +23,7 @@
 .custom-article-typography p,
 .custom-article-typography ul,
 .custom-article-typography ol {
-  @apply text-sm mb-4;
+  @apply text-sm mb-4 text-gray-600 dark:text-gray-400;
 }
 
 .custom-article-typography li {
@@ -97,18 +97,50 @@
 }
 
 .card-content {
-  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding-top 0.5s ease-in-out;
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  max-height: 0;
   opacity: 0;
   overflow: hidden;
-  padding-top: 0;
 }
 
 .card-content.expanded {
+  max-height: 10000px; /* Adjust this value based on your content */
   opacity: 1;
-  padding-top: 1.5rem; /* This adds the extra space when expanded */
 }
 
 .expanded .card-summary {
   opacity: 0.5;
   transition: opacity 0.3s ease-in-out;
+}
+
+.prose {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply text-gray-900 dark:text-gray-200;
+}
+
+.prose strong {
+  @apply text-gray-900 dark:text-gray-200;
+}
+
+.prose a {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.prose ul, .prose ol {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+.card-content {
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.card-content.expanded {
+  max-height: 10000px; /* Adjust this value based on your content */
+  opacity: 1;
 }
