@@ -101,8 +101,12 @@ export default function Category({ initialCategory, initialPosts, categories }) 
         </div>
       </main>
 
-      {/* Right panel - Empty */}
-      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10">
+      {/* Right panel */}
+      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
+        {/* Remove this div containing the DigitalClock */}
+        {/* <div className="mb-4">
+          <DigitalClock />
+        </div> */}
       </div>
     </div>
   )

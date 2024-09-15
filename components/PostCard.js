@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FaThumbtack, FaChevronDown, FaTag } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 const PostCard = ({ title, subheading, date, category, description, content, pinned, tags, onTagClick }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -13,6 +15,12 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
   };
 
   const displayTags = tags.filter(tag => tag !== 'personalWebsite' && tag !== category);
+
+  // Format the date correctly
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
 
   return (
     <div 
@@ -39,15 +47,25 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
           maxHeight: isExpanded ? `${contentRef.current?.scrollHeight}px` : '0px',
         }}
       >
-        <div className="pt-2 pb-4">
-          <ReactMarkdown className="prose dark:prose-invert dark:prose-dark max-w-none custom-article-typography">
+        <div className="pt-2 pb-8">
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            components={{
+              table: props => <table className="border-collapse table-auto w-full text-sm mb-4" {...props} />,
+              thead: props => <thead className="bg-gray-50 dark:bg-gray-700" {...props} />,
+              th: props => <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left" {...props} />,
+              td: props => <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props} />
+            }}
+            className="prose dark:prose-invert dark:prose-dark max-w-none custom-article-typography"
+          >
             {content}
           </ReactMarkdown>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-gray-600 dark:text-gray-400 mt-3">
-        <span className="mb-2 sm:mb-0">{new Date(date).toLocaleDateString()}</span>
+        <span className="mb-2 sm:mb-0">{formatDate(date)}</span>
         <div className="flex flex-wrap gap-1 sm:gap-2">
           {displayTags.map((tag, index) => (
             <button

@@ -66,17 +66,17 @@ export default function Home({ allPostsData = [], categories = [] }) {
           )}
         </div>
         <div className="p-4 space-y-4">
-          {filteredPosts.map(({ id, date, title, subheading, category, description, content, pinned, tags }) => (
+          {filteredPosts.map((post) => (
             <PostCard 
-              key={id} 
-              title={title}
-              subheading={subheading}
-              date={date} 
-              category={category} 
-              description={description} 
-              content={content}
-              pinned={pinned} 
-              tags={tags}
+              key={post.id} 
+              title={post.title}
+              subheading={post.subheading}
+              date={post.date} 
+              category={post.category} 
+              description={post.description} 
+              content={post.content}
+              pinned={post.pinned} 
+              tags={post.tags}
               onTagClick={handleTagClick}
             />
           ))}
@@ -86,8 +86,9 @@ export default function Home({ allPostsData = [], categories = [] }) {
         </div>
       </main>
 
-      {/* Right panel - Empty */}
-      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10">
+      {/* Right panel */}
+      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
+        {/* Add other right panel content here */}
       </div>
     </div>
   )
