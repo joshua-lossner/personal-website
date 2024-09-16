@@ -24,7 +24,6 @@ export default function Category({ initialCategory, initialPosts, categories }) 
   const [category, setCategory] = useState(initialCategory);
   const [posts, setPosts] = useState(initialPosts);
   const [activeTag, setActiveTag] = useState(null);
-  const [playlist, setPlaylist] = useState([]);
 
   useEffect(() => {
     if (router.query.id) {
@@ -49,27 +48,6 @@ export default function Category({ initialCategory, initialPosts, categories }) 
       setActiveTag(tag);
     }
   };
-
-  const loadPlaylist = async (directory) => {
-    console.log('loadPlaylist called with directory:', directory);
-    try {
-      const response = await fetch(`/api/music?directory=${directory}`);
-      const data = await response.json();
-      console.log('Playlist data received:', data);
-      if (Array.isArray(data.playlist)) {
-        setPlaylist(data.playlist);
-      } else {
-        console.error('Invalid playlist data received:', data);
-        setPlaylist([]);
-      }
-    } catch (error) {
-      console.error('Error loading playlist:', error);
-      setPlaylist([]);
-    }
-  };
-
-  console.log('Category:', category);
-  console.log('Playlist:', playlist);
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -104,20 +82,24 @@ export default function Category({ initialCategory, initialPosts, categories }) 
         </div>
         <div className="flex-grow overflow-y-auto scrollbar-hide">
           <div className="p-4 space-y-4 max-w-3xl mx-auto w-full"> {/* Updated this line */}
-            {posts.map(({ id, date, title, subheading, category, description, content, pinned, tags }) => (
-              <PostCard 
-                key={id} 
-                title={title}
-                subheading={subheading}
-                date={date} 
-                category={category} 
-                description={description} 
-                content={content}
-                pinned={pinned}
-                tags={tags}
-                onTagClick={handleTagClick}
-              />
-            ))}
+            {posts.map((post) => {
+              console.log('Rendering post:', post);
+              return (
+                <PostCard 
+                  key={post.id} 
+                  title={post.title}
+                  subheading={post.subheading}
+                  date={post.date} 
+                  category={post.category} 
+                  description={post.description} 
+                  content={post.content}
+                  pinned={post.pinned}
+                  tags={post.tags}
+                  onTagClick={handleTagClick}
+                  audioFile={post.audioFile}
+                />
+              );
+            })}
             {posts.length === 0 && (
               <p className="text-gray-600 dark:text-gray-400">No posts available in this category.</p>
             )}
@@ -129,7 +111,7 @@ export default function Category({ initialCategory, initialPosts, categories }) 
       <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
         {category.toLowerCase() === 'music' && (
           <ErrorBoundary>
-            <MusicPlayer playlist={playlist} onLoadPlaylist={loadPlaylist} />
+            <MusicPlayer />
           </ErrorBoundary>
         )}
       </div>
@@ -143,33 +125,47 @@ export async function getStaticPaths() {
     params: { id: category.id },
   }));
 
+  console.log('Generated paths:', paths);
+
   return { paths, fallback: 'blocking' };
 }
 
 export async function getStaticProps({ params }) {
-  const categories = getCategories();
-  const category = categories.find((c) => c.id === params.id);
-  const allPosts = await getSortedPostsData();
-  
-  if (!category) {
-    return {
-      notFound: true,
-    };
-  }
+  try {
+    const categories = getCategories();
+    const category = categories.find((c) => c.id === params.id);
+    const allPosts = await getSortedPostsData();
+    
+    console.log(`Generating props for category: ${params.id}`);
+    console.log('Category found:', category);
+    console.log('All posts:', allPosts.length);
 
-  let initialPosts = allPosts.filter((post) => {
-    if (category.id === 'home') {
-      return post.isHomePost;
+    if (!category) {
+      console.log(`Category not found: ${params.id}`);
+      return {
+        notFound: true,
+      };
     }
-    return post.category.toLowerCase() === category.id.toLowerCase();
-  });
 
-  return {
-    props: {
-      initialCategory: category.name,
-      initialPosts,
-      categories,
-    },
-    revalidate: 60 * 5, // Regenerate the page every 5 minutes
-  };
+    let initialPosts = allPosts.filter((post) => {
+      if (category.id === 'home') {
+        return post.isHomePost;
+      }
+      return post.category.toLowerCase() === category.id.toLowerCase();
+    });
+
+    console.log(`Filtered posts for ${category.id}:`, initialPosts.length);
+
+    return {
+      props: {
+        initialCategory: category.name,
+        initialPosts,
+        categories,
+      },
+      revalidate: 60 * 5, // Regenerate the page every 5 minutes
+    };
+  } catch (error) {
+    console.error(`Error generating props for ${params.id}:`, error);
+    return { notFound: true };
+  }
 }

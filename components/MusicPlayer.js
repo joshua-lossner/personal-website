@@ -1,106 +1,71 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaGuitar, FaRedo } from 'react-icons/fa';
+import React, { useContext, useState } from 'react';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaGuitar } from 'react-icons/fa';
 import { GiGrandPiano, GiSaxophone } from 'react-icons/gi';
+import { AudioContext } from '../contexts/AudioContext';
 
-const MusicPlayer = ({ playlist = [], onLoadPlaylist }) => {
-  const [currentTrack, setCurrentTrack] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const audioRef = useRef(null);
+const MusicPlayer = () => {
+  const { playlist, currentTrack, isPlaying, playPause, nextTrack, prevTrack, loadPlaylist, setCurrentTrack } = useContext(AudioContext);
+  const [selectedGenre, setSelectedGenre] = useState(null);
 
-  useEffect(() => {
-    if (playlist.length > 0 && audioRef.current) {
-      audioRef.current.src = playlist[currentTrack].url;
-      if (isPlaying) {
-        audioRef.current.play();
-      }
-    }
-  }, [playlist, currentTrack, isPlaying]);
+  const genreButtons = [
+    { genre: 'piano', icon: <GiGrandPiano size={24} /> },
+    { genre: 'string', icon: <FaGuitar size={24} /> },
+    { genre: 'jazz', icon: <GiSaxophone size={24} /> },
+  ];
 
-  const playPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+  const handleGenreClick = (genre) => {
+    setSelectedGenre(genre);
+    loadPlaylist(genre);
   };
 
-  const nextTrack = () => {
-    setCurrentTrack((prev) => (prev + 1) % playlist.length);
-  };
-
-  const prevTrack = () => {
-    setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
-  };
-
-  const handleLoadPlaylist = (genre) => {
-    onLoadPlaylist(genre);
-    setCurrentTrack(0);
-    setIsPlaying(true);
-  };
-
-  const toggleRepeat = () => {
-    setIsRepeat(!isRepeat);
-    if (audioRef.current) {
-      audioRef.current.loop = !isRepeat;
-    }
-  };
-
-  const handleTrackEnd = () => {
-    if (!isRepeat) {
-      nextTrack();
-    }
+  // Function to remove .mp3 extension from song title
+  const formatSongTitle = (title) => {
+    return title.replace('.mp3', '');
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-      <div className="flex justify-center space-x-4 mb-4">
-        <button onClick={() => handleLoadPlaylist('piano')} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-          <GiGrandPiano size={24} />
-        </button>
-        <button onClick={() => handleLoadPlaylist('string')} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-          <FaGuitar size={24} />
-        </button>
-        <button onClick={() => handleLoadPlaylist('jazz')} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-          <GiSaxophone size={24} />
-        </button>
+      <div className="flex justify-center space-x-4 mb-6">
+        {genreButtons.map(({ genre, icon }) => (
+          <button
+            key={genre}
+            onClick={() => handleGenreClick(genre)}
+            className={`w-12 h-12 flex items-center justify-center rounded-full 
+              ${selectedGenre === genre 
+                ? 'bg-gray-900 dark:bg-blue-900 text-white' 
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300'} 
+              hover:opacity-80 transition-all duration-200`}
+          >
+            {icon}
+          </button>
+        ))}
       </div>
       {playlist.length > 0 ? (
         <div>
-          <audio ref={audioRef} onEnded={handleTrackEnd} />
           <div className="flex justify-center items-center space-x-4 mb-4">
             <button onClick={prevTrack} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-              <FaStepBackward size={20} />
+              <FaStepBackward size={24} />
             </button>
             <button onClick={playPause} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-              {isPlaying ? <FaPause size={20} /> : <FaPlay size={20} />}
+              {isPlaying ? <FaPause size={24} /> : <FaPlay size={24} />}
             </button>
             <button onClick={nextTrack} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
-              <FaStepForward size={20} />
-            </button>
-            <button 
-              onClick={toggleRepeat} 
-              className={`text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white ${isRepeat ? 'text-blue-500 dark:text-blue-400' : ''}`}
-            >
-              <FaRedo size={20} />
+              <FaStepForward size={24} />
             </button>
           </div>
-          {isPlaying && (
-            <div className="mt-4 max-h-40 overflow-y-auto">
-              <ul className="text-sm text-gray-600 dark:text-gray-400">
-                {playlist.map((track, index) => (
-                  <li 
-                    key={index} 
-                    className={`cursor-pointer p-1 ${index === currentTrack ? 'font-bold' : ''}`}
-                    onClick={() => setCurrentTrack(index)}
-                  >
-                    {track.title}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div className="mt-4 max-h-40 overflow-y-auto">
+            <ul className="text-sm text-gray-600 dark:text-gray-400">
+              {playlist.map((track, index) => (
+                <li 
+                  key={index} 
+                  className={`cursor-pointer p-1 ${index === currentTrack ? 'font-bold' : ''}`}
+                  onClick={() => setCurrentTrack(index)}
+                >
+                  {formatSongTitle(track.title)}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       ) : (
         <p className="text-center text-gray-600 dark:text-gray-400">No tracks loaded. Select a playlist to start.</p>
