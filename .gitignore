@@ -40,4 +40,4 @@ next-env.d.ts
 *.log
 
 # OS generated files
-Thumbs.db
+Thumbs.db/public
