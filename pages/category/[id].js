@@ -5,6 +5,8 @@ import Sidebar from '../../components/Sidebar'
 import PostCard from '../../components/PostCard'
 import { getSortedPostsData } from '../../lib/posts'
 import { getCategories } from '../../utils/categories'
+import MusicPlayer from '../../components/MusicPlayer'; // Replaced dynamic import with direct import
+import ErrorBoundary from '../../components/ErrorBoundary'; // Add this line
 
 const categorySubheadings = {
   blog: "Thoughts and insights on technology and life",
@@ -22,6 +24,7 @@ export default function Category({ initialCategory, initialPosts, categories }) 
   const [category, setCategory] = useState(initialCategory);
   const [posts, setPosts] = useState(initialPosts);
   const [activeTag, setActiveTag] = useState(null);
+  const [playlist, setPlaylist] = useState([]);
 
   useEffect(() => {
     if (router.query.id) {
@@ -46,6 +49,27 @@ export default function Category({ initialCategory, initialPosts, categories }) 
       setActiveTag(tag);
     }
   };
+
+  const loadPlaylist = async (directory) => {
+    console.log('loadPlaylist called with directory:', directory);
+    try {
+      const response = await fetch(`/api/music?directory=${directory}`);
+      const data = await response.json();
+      console.log('Playlist data received:', data);
+      if (Array.isArray(data.playlist)) {
+        setPlaylist(data.playlist);
+      } else {
+        console.error('Invalid playlist data received:', data);
+        setPlaylist([]);
+      }
+    } catch (error) {
+      console.error('Error loading playlist:', error);
+      setPlaylist([]);
+    }
+  };
+
+  console.log('Category:', category);
+  console.log('Playlist:', playlist);
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -103,10 +127,11 @@ export default function Category({ initialCategory, initialPosts, categories }) 
 
       {/* Right panel */}
       <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
-        {/* Remove this div containing the DigitalClock */}
-        {/* <div className="mb-4">
-          <DigitalClock />
-        </div> */}
+        {category.toLowerCase() === 'music' && (
+          <ErrorBoundary>
+            <MusicPlayer playlist={playlist} onLoadPlaylist={loadPlaylist} />
+          </ErrorBoundary>
+        )}
       </div>
     </div>
   )
@@ -132,7 +157,7 @@ export async function getStaticProps({ params }) {
     };
   }
 
-  const initialPosts = allPosts.filter((post) => {
+  let initialPosts = allPosts.filter((post) => {
     if (category.id === 'home') {
       return post.isHomePost;
     }

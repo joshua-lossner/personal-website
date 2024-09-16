@@ -144,3 +144,40 @@
   max-height: 10000px; /* Adjust this value based on your content */
   opacity: 1;
 }
+
+@keyframes scrolling {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-scrolling {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scrolling 15s linear infinite;
+}
+
+/* Add this to your existing styles */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
+}
+
+/* Remove these styles */
+.music-player-carousel {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.music-player-carousel button {
+  transition: all 0.5s ease;
+  opacity: 0.7;
+}
+
+.music-player-carousel button:hover {
+  opacity: 1;
+}
+
+.music-player-carousel button.active {
+  opacity: 1;
+}
