@@ -2,8 +2,11 @@ import React, { useContext, useState } from 'react';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaGuitar } from 'react-icons/fa';
 import { GiGrandPiano, GiSaxophone } from 'react-icons/gi';
 import { AudioContext } from '../contexts/AudioContext';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
-const MusicPlayer = () => {
+const MusicPlayer = ({ posts }) => {
   const { playlist, currentTrack, isPlaying, playPause, nextTrack, prevTrack, loadPlaylist, setCurrentTrack } = useContext(AudioContext);
   const [selectedGenre, setSelectedGenre] = useState(null);
 
@@ -18,9 +21,17 @@ const MusicPlayer = () => {
     loadPlaylist(genre);
   };
 
-  // Function to remove .mp3 extension from song title
   const formatSongTitle = (title) => {
     return title.replace('.mp3', '');
+  };
+
+  const getCurrentLyrics = () => {
+    if (playlist.length > 0) {
+      const currentSong = playlist[currentTrack];
+      const songPost = posts.find(post => post.audioFile === currentSong.title);
+      return songPost ? songPost.content : '';
+    }
+    return '';
   };
 
   return (
@@ -53,7 +64,7 @@ const MusicPlayer = () => {
               <FaStepForward size={24} />
             </button>
           </div>
-          <div className="mt-4 max-h-40 overflow-y-auto">
+          <div className="mt-4 max-h-40 overflow-y-auto mb-4">
             <ul className="text-sm text-gray-600 dark:text-gray-400">
               {playlist.map((track, index) => (
                 <li 
@@ -65,6 +76,15 @@ const MusicPlayer = () => {
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              className="prose dark:prose-invert max-w-none"
+            >
+              {getCurrentLyrics()}
+            </ReactMarkdown>
           </div>
         </div>
       ) : (

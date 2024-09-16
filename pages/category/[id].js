@@ -111,7 +111,7 @@ export default function Category({ initialCategory, initialPosts, categories }) 
       <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
         {category.toLowerCase() === 'music' && (
           <ErrorBoundary>
-            <MusicPlayer />
+            <MusicPlayer posts={posts} />
           </ErrorBoundary>
         )}
       </div>
