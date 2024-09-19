@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 
-const MusicPlayer = ({ posts }) => {
+const MusicPlayer = ({ posts = [] }) => {
   const { playlist, currentTrack, isPlaying, playPause, nextTrack, prevTrack, loadPlaylist, setCurrentTrack } = useContext(AudioContext);
   const [selectedGenre, setSelectedGenre] = useState(null);
 
@@ -35,7 +35,7 @@ const MusicPlayer = ({ posts }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+    <div className="w-full bg-gray-200 dark:bg-gray-700 p-4 rounded-lg mb-4">
       <div className="flex justify-center space-x-4 mb-6">
         {genreButtons.map(({ genre, icon }) => (
           <button
@@ -69,7 +69,10 @@ const MusicPlayer = ({ posts }) => {
               {playlist.map((track, index) => (
                 <li 
                   key={index} 
-                  className={`cursor-pointer p-1 ${index === currentTrack ? 'font-bold' : ''}`}
+                  className={`cursor-pointer p-2 rounded transition-all duration-200
+                    ${index === currentTrack 
+                      ? 'bg-gray-300 dark:bg-gray-600 border-l-4 border-blue-500 dark:border-blue-400' 
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-500'}`}
                   onClick={() => setCurrentTrack(index)}
                 >
                   {formatSongTitle(track.title)}

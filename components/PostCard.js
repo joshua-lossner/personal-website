@@ -6,6 +6,13 @@ import rehypeRaw from 'rehype-raw';
 import { AudioContext } from '../contexts/AudioContext';
 
 const PostCard = ({ title, subheading, date, category, description, content, pinned, tags, onTagClick, audioFile }) => {
+  // Add default values or use optional chaining
+  title = title || 'Untitled';
+  category = category || 'Uncategorized';
+  description = description || '';
+  tags = tags || [];
+  date = date || new Date().toISOString(); // Provide a default date if it's undefined
+
   const [isExpanded, setIsExpanded] = useState(false);
   const { playSong, addToQueue, addToUpNext } = useContext(AudioContext);
 
@@ -23,6 +30,8 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
   };
 
   const MusicButtons = () => {
+    if (!audioFile) return null; // Add this line
+
     return (
       <div className="absolute top-2 right-2 flex space-x-2">
         <button 

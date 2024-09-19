@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head'
-import Sidebar from '../../components/Sidebar'
 import PostCard from '../../components/PostCard'
 import { getSortedPostsData } from '../../lib/posts'
 import { getCategories } from '../../utils/categories'
-import MusicPlayer from '../../components/MusicPlayer'; // Replaced dynamic import with direct import
-import ErrorBoundary from '../../components/ErrorBoundary'; // Add this line
 
 const categorySubheadings = {
   blog: "Thoughts and insights on technology and life",
@@ -19,18 +16,18 @@ const categorySubheadings = {
   home: "Welcome to my personal website",
 };
 
-export default function Category({ initialCategory, initialPosts, categories }) {
+export default function Category({ initialCategory, initialPosts = [], categories = [] }) {
   const router = useRouter();
   const [category, setCategory] = useState(initialCategory);
   const [posts, setPosts] = useState(initialPosts);
   const [activeTag, setActiveTag] = useState(null);
 
   useEffect(() => {
-    if (router.query.id) {
+    if (router.query.id && categories && categories.length > 0) {
       const newCategory = categories.find(c => c.id === router.query.id);
       if (newCategory) {
         setCategory(newCategory.name);
-        setPosts(initialPosts.filter(post => post.category.toLowerCase() === router.query.id.toLowerCase()));
+        setPosts(initialPosts.filter(post => post.tags && post.tags.includes(`#${router.query.id}`)));
         setActiveTag(null);
       }
     }
@@ -38,84 +35,69 @@ export default function Category({ initialCategory, initialPosts, categories }) 
 
   const handleTagClick = (tag) => {
     if (activeTag === tag) {
-      setPosts(initialPosts.filter(post => post.category.toLowerCase() === router.query.id.toLowerCase()));
+      setPosts(initialPosts.filter(post => post.tags && post.tags.includes(`#${router.query.id}`)));
       setActiveTag(null);
     } else {
       const filteredPosts = initialPosts.filter(post => 
-        post.category.toLowerCase() === router.query.id.toLowerCase() && post.tags.includes(tag)
+        post.tags && post.tags.includes(`#${router.query.id}`) && post.tags.includes(tag)
       );
       setPosts(filteredPosts);
       setActiveTag(tag);
     }
   };
 
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
+
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <main className="flex-grow flex flex-col overflow-hidden relative">
       <Head>
-        <title>{`${category} - Joshua Lossner`}</title>
+        <title>{`${category || 'Category'} - Joshua Lossner`}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* Left panel - Categories */}
-      <div className="w-16 flex-shrink-0 z-10">
-        <Sidebar categories={categories} />
-      </div>
-
-      {/* Main content area */}
-      <main className="flex-grow flex flex-col overflow-hidden relative">
-        <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
-          <div className="p-4">
-            <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">{category}</h1>
-            <h2 className="text-lg mb-2 text-gray-600 dark:text-gray-400">{categorySubheadings[category.toLowerCase()] || ''}</h2>
-          </div>
-          {activeTag && (
-            <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-              Showing posts tagged with: {activeTag}
-              <button 
-                onClick={() => handleTagClick(activeTag)} 
-                className="ml-2 text-blue-600 dark:text-blue-300 hover:underline"
-              >
-                Clear filter
-              </button>
-            </div>
-          )}
+      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
+        <div className="p-4">
+          <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">{category || 'Category'}</h1>
+          <h2 className="text-lg mb-2 text-gray-600 dark:text-gray-400">{category && categorySubheadings[category.toLowerCase()] || ''}</h2>
         </div>
-        <div className="flex-grow overflow-y-auto scrollbar-hide">
-          <div className="p-4 space-y-4 max-w-3xl mx-auto w-full"> {/* Updated this line */}
-            {posts.map((post) => {
-              console.log('Rendering post:', post);
-              return (
-                <PostCard 
-                  key={post.id} 
-                  title={post.title}
-                  subheading={post.subheading}
-                  date={post.date} 
-                  category={post.category} 
-                  description={post.description} 
-                  content={post.content}
-                  pinned={post.pinned}
-                  tags={post.tags}
-                  onTagClick={handleTagClick}
-                  audioFile={post.audioFile}
-                />
-              );
-            })}
-            {posts.length === 0 && (
-              <p className="text-gray-600 dark:text-gray-400">No posts available in this category.</p>
-            )}
+        {activeTag && (
+          <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+            Showing posts tagged with: {activeTag}
+            <button 
+              onClick={() => handleTagClick(activeTag)} 
+              className="ml-2 text-blue-600 dark:text-blue-300 hover:underline"
+            >
+              Clear filter
+            </button>
           </div>
-        </div>
-      </main>
-
-      {/* Right panel */}
-      <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4">
-        {category.toLowerCase() === 'music' && (
-          <ErrorBoundary>
-            <MusicPlayer posts={posts} />
-          </ErrorBoundary>
         )}
       </div>
-    </div>
+      <div className="flex-grow overflow-y-auto scrollbar-hide">
+        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full">
+          {posts && posts.length > 0 ? (
+            posts.map((post) => (
+              <PostCard 
+                key={post.id} 
+                title={post.title}
+                subheading={post.subheading}
+                date={post.date} 
+                category={post.category} 
+                description={post.description} 
+                content={post.content}
+                pinned={post.pinned}
+                tags={post.tags}
+                onTagClick={handleTagClick}
+                audioFile={post.audioFile}
+              />
+            ))
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">No posts available in this category.</p>
+          )}
+        </div>
+      </div>
+    </main>
   )
 }
 
@@ -127,45 +109,33 @@ export async function getStaticPaths() {
 
   console.log('Generated paths:', paths);
 
-  return { paths, fallback: 'blocking' };
+  return { paths, fallback: true };
 }
 
 export async function getStaticProps({ params }) {
   try {
     const categories = getCategories();
-    const category = categories.find((c) => c.id === params.id);
+    const initialCategory = categories.find((cat) => cat.id === params.id);
     const allPosts = await getSortedPostsData();
-    
-    console.log(`Generating props for category: ${params.id}`);
-    console.log('Category found:', category);
-    console.log('All posts:', allPosts.length);
-
-    if (!category) {
-      console.log(`Category not found: ${params.id}`);
-      return {
-        notFound: true,
-      };
-    }
-
-    let initialPosts = allPosts.filter((post) => {
-      if (category.id === 'home') {
-        return post.isHomePost;
-      }
-      return post.category.toLowerCase() === category.id.toLowerCase();
-    });
-
-    console.log(`Filtered posts for ${category.id}:`, initialPosts.length);
+    const initialPosts = allPosts.filter(post => post.tags && post.tags.includes(`#${params.id}`));
 
     return {
       props: {
-        initialCategory: category.name,
-        initialPosts,
-        categories,
+        initialCategory: initialCategory ? initialCategory.name : null,
+        initialPosts: initialPosts || [],
+        categories: categories || [],
       },
-      revalidate: 60 * 5, // Regenerate the page every 5 minutes
+      revalidate: 60, // Revalidate every 60 seconds
     };
   } catch (error) {
-    console.error(`Error generating props for ${params.id}:`, error);
-    return { notFound: true };
+    console.error(`Error fetching data for category ${params.id}:`, error);
+    return {
+      props: {
+        initialCategory: null,
+        initialPosts: [],
+        categories: [],
+      },
+      revalidate: 60,
+    };
   }
 }
