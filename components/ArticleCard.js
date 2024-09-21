@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks'; // Add this import
 
 export default function ArticleCard({ post }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -19,7 +20,12 @@ export default function ArticleCard({ post }) {
       </button>
       {isExpanded && (
         <div className="content text-gray-600 text-sm"> {/* Adjusted styles for consistency */}
-          <ReactMarkdown className="prose dark:prose-invert max-w-none">{content}</ReactMarkdown>
+          <ReactMarkdown 
+            className="prose dark:prose-invert max-w-none"
+            remarkPlugins={[remarkBreaks]} // Updated here
+          >
+            {content}
+          </ReactMarkdown>
         </div>
       )}
     </div>

@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { AudioContext } from '../contexts/AudioContext';
+import remarkBreaks from 'remark-breaks'; // Add this import
 
 const PostCard = ({ title, subtitle, datePublished, category, description, content, tags, onTagClick, audioFile }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -66,7 +67,10 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
       {isExpanded && hasAdditionalContent && (
         <div className="mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-inner transition-all duration-300 ease-in-out">
           <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm, remarkBreaks]} // Updated here
+              rehypePlugins={[rehypeRaw]}
+            >
               {content}
             </ReactMarkdown>
           </div>
