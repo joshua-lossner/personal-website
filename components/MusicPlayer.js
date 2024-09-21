@@ -105,7 +105,7 @@ const MusicPlayer = ({ posts = [] }) => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="flex justify-center space-x-4 mb-2"> {/* Reduced margin */}
+      <div className="flex justify-center space-x-4 mb-4"> {/* Increased margin-bottom from mb-2 to mb-4 */}
         {genreButtons.map(({ genre, icon }) => (
           <button 
             key={genre} 

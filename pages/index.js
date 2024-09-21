@@ -27,8 +27,8 @@ export default function Home({ initialPosts }) {
 
       <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 header-container">
         <div className="p-4">
-          <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">Joshua C. Lossner</h1>
-          <h2 className="text-lg text-gray-600 dark:text-gray-400">Where Tech Meets Creativity</h2>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Joshua C. Lossner</h1>
+          <h2 className="text-lg text-gray-600 dark:text-gray-400">IT Professional and Generative AI Enthusiast</h2>
         </div>
         {activeTag && (
           <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">

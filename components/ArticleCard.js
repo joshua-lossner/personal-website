@@ -5,17 +5,21 @@ export default function ArticleCard({ post }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { metadata, content } = post;
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div className="article-card">
-      <h2>{metadata.title}</h2>
-      <p>{metadata.description}</p>
+      <h2 className="text-lg font-bold">{metadata.title}</h2>
+      <p className="text-gray-600">{metadata.description}</p>
       <p className="date">{new Date(metadata.date).toLocaleDateString()}</p>
-      <button onClick={() => setIsExpanded(!isExpanded)}>
+      <button onClick={toggleExpand}>
         {isExpanded ? 'Hide' : 'Read More'}
       </button>
       {isExpanded && (
-        <div className="content">
-          <ReactMarkdown>{content}</ReactMarkdown>
+        <div className="content text-gray-600 text-sm"> {/* Adjusted styles for consistency */}
+          <ReactMarkdown className="prose dark:prose-invert max-w-none">{content}</ReactMarkdown>
         </div>
       )}
     </div>

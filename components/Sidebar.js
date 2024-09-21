@@ -11,7 +11,7 @@ export default function Sidebar({ categories = [] }) {
   }
 
   return (
-    <div className="w-16 bg-gray-200 dark:bg-gray-800 h-full flex flex-col justify-between items-center py-4">
+    <div className="w-20 bg-gray-200 dark:bg-gray-800 h-full flex flex-col justify-between items-center py-4 px-2"> {/* Increased width and added horizontal padding */}
       <ul className="space-y-8">
         <li onMouseEnter={() => prefetchCategory('home')}>
           <Link href="/">
