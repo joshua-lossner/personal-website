@@ -59,10 +59,12 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
       </div>
 
       {isExpanded && (
-        <div className="mt-4 prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-            {content}
-          </ReactMarkdown>
+        <div className="mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-inner transition-all duration-300 ease-in-out">
+          <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+              {content}
+            </ReactMarkdown>
+          </div>
         </div>
       )}
 
