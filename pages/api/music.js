@@ -6,13 +6,7 @@ export default async function handler(req, res) {
 
   console.log('API route called with directory:', directory);
 
-  const directoryMap = {
-    jazz: 'seasonal-jazz',
-    piano: 'seasonal-piano',
-    string: 'seasonal-strings',
-  };
-
-  const playlistDirectory = path.join(process.cwd(), 'public', 'audio', 'playlist', directoryMap[directory]);
+  const playlistDirectory = path.join(process.cwd(), 'public', 'audio', 'site-playlist', directory);
 
   console.log('Playlist directory:', playlistDirectory);
 
@@ -23,8 +17,8 @@ export default async function handler(req, res) {
     const playlist = files
       .filter(file => file.endsWith('.mp3'))
       .map(file => ({
-        title: file.replace('.mp3', ''),
-        url: `/audio/playlist/${directoryMap[directory]}/${file}`,
+        title: file,
+        url: `/audio/site-playlist/${directory}/${file}`,
       }));
 
     console.log('Playlist generated:', playlist);

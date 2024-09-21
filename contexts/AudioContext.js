@@ -6,6 +6,9 @@ export const AudioProvider = ({ children }) => {
   const [playlist, setPlaylist] = useState([]);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'all', 'one'
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -17,6 +20,12 @@ export const AudioProvider = ({ children }) => {
     }
   }, [currentTrack, isPlaying]);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
   const playPause = () => {
     if (isPlaying) {
       audioRef.current.pause();
@@ -27,11 +36,47 @@ export const AudioProvider = ({ children }) => {
   };
 
   const nextTrack = () => {
-    setCurrentTrack((prev) => (prev + 1) % playlist.length);
+    if (isShuffled) {
+      const nextIndex = Math.floor(Math.random() * playlist.length);
+      setCurrentTrack(nextIndex);
+    } else {
+      setCurrentTrack((prev) => (prev + 1) % playlist.length);
+    }
   };
 
   const prevTrack = () => {
-    setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
+    if (isShuffled) {
+      const prevIndex = Math.floor(Math.random() * playlist.length);
+      setCurrentTrack(prevIndex);
+    } else {
+      setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
+    }
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffled(!isShuffled);
+  };
+
+  const toggleRepeat = () => {
+    setRepeatMode(current => {
+      switch (current) {
+        case 'off': return 'all';
+        case 'all': return 'one';
+        case 'one': return 'off';
+        default: return 'off';
+      }
+    });
+  };
+
+  const handleTrackEnd = () => {
+    if (repeatMode === 'one') {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    } else if (repeatMode === 'all' || currentTrack < playlist.length - 1) {
+      nextTrack();
+    } else {
+      setIsPlaying(false);
+    }
   };
 
   const loadPlaylist = async (genre) => {
@@ -44,7 +89,7 @@ export const AudioProvider = ({ children }) => {
         setCurrentTrack(0);
         setIsPlaying(true);
         if (audioRef.current) {
-          audioRef.current.src = data.playlist[0].url;
+          audioRef.current.src = `/audio/site-playlist/${genre}/${data.playlist[0].title}`; // Updated path
           audioRef.current.play().catch(error => console.error('Error playing audio:', error));
         }
       } else {
@@ -118,6 +163,33 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const removeFromPlaylist = (index) => {
+    setPlaylist(prev => {
+      const newPlaylist = [...prev.slice(0, index), ...prev.slice(index + 1)];
+      if (index < currentTrack) {
+        setCurrentTrack(currentTrack - 1);
+      } else if (index === currentTrack && newPlaylist.length > 0) {
+        // If we're removing the current track, play the next one (or the previous if it's the last)
+        audioRef.current.src = newPlaylist[currentTrack % newPlaylist.length].url;
+        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+      } else if (newPlaylist.length === 0) {
+        setIsPlaying(false);
+        setCurrentTrack(0);
+      }
+      return newPlaylist;
+    });
+  };
+
+  const stopAndClearPlaylist = () => {
+    setPlaylist([]);
+    setCurrentTrack(0);
+    setIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
+
   return (
     <AudioContext.Provider value={{
       playlist,
@@ -131,12 +203,20 @@ export const AudioProvider = ({ children }) => {
       setCurrentTrack,
       playSong,
       addToQueue,
-      addToUpNext
+      addToUpNext,
+      removeFromPlaylist,
+      volume,
+      setVolume,
+      isShuffled,
+      toggleShuffle,
+      repeatMode,
+      toggleRepeat,
+      stopAndClearPlaylist
     }}>
       {children}
       <audio 
         ref={audioRef} 
-        onEnded={nextTrack}
+        onEnded={handleTrackEnd}
         onError={(e) => console.error('Audio error:', e)}
       />
     </AudioContext.Provider>
