@@ -35,6 +35,9 @@ async function processFile(filePath, content) {
     content: markdownContent
   };
   
+  console.log('Processing file:', filePath);
+  console.log('Metadata:', metadata);
+  
   await fs.writeFile(path.join(localContentDir, filePath), content);
   await updateDatabase(post);
 }
@@ -89,7 +92,11 @@ async function fetchAndStoreDocuments() {
         for (const field of requiredFields) {
           if (!data[field]) {
             console.warn(`Warning: Missing ${field} for ${file.path}`);
-            data[field] = 'No ' + field + ' available.';
+            if (field === 'category') {
+              data[field] = 'Uncategorized';  // Set a default category
+            } else {
+              data[field] = 'No ' + field + ' available.';
+            }
           }
         }
 
@@ -100,6 +107,20 @@ async function fetchAndStoreDocuments() {
         data.pinned = data.pinned || false;
         data.tags = data.tags || [];
 
+        // Ensure datePublished is in the correct format
+        if (data.datePublished) {
+          const date = new Date(data.datePublished);
+          if (!isNaN(date.getTime())) {
+            data.datePublished = date.toISOString();
+          } else {
+            console.warn(`Warning: Invalid datePublished for ${file.path}. Using current date.`);
+            data.datePublished = new Date().toISOString();
+          }
+        } else {
+          console.warn(`Warning: Missing datePublished for ${file.path}. Using current date.`);
+          data.datePublished = new Date().toISOString();
+        }
+
         const localPath = path.join(localContentDir, file.path);
         await fs.mkdir(path.dirname(localPath), { recursive: true });
         
@@ -107,7 +128,7 @@ async function fetchAndStoreDocuments() {
         const updatedContent = matter.stringify(markdownContent, data);
         await fs.writeFile(localPath, updatedContent);
         await processFile(file.path, updatedContent);
-        console.log(`Stored and processed: ${file.path}`);
+        console.log(`Stored and processed: ${file.path} (Category: ${data.category})`);
       } else {
         console.log(`Skipped unpublished document: ${file.path}`);
       }

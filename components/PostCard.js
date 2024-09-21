@@ -5,13 +5,13 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { AudioContext } from '../contexts/AudioContext';
 
-const PostCard = ({ title, subheading, date, category, description, content, pinned, tags, onTagClick, audioFile }) => {
+const PostCard = ({ title, subtitle, datePublished, category, description, content, pinned, tags, onTagClick, audioFile }) => {
   // Add default values or use optional chaining
   title = title || 'Untitled';
   category = category || 'Uncategorized';
   description = description || '';
   tags = tags || [];
-  date = date || new Date().toISOString(); // Provide a default date if it's undefined
+  datePublished = datePublished || new Date().toISOString(); // Provide a default date if it's undefined
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { playSong, addToQueue, addToUpNext } = useContext(AudioContext);
@@ -19,8 +19,26 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
   const displayTags = tags.filter(tag => tag !== 'personalWebsite' && tag !== category);
 
   const formatDate = (dateString) => {
+    console.log('Raw datePublished:', dateString); // Add this line for debugging
+    
+    if (!dateString) return 'No date available';
+
+    // Try parsing as ISO string
+    let date = new Date(dateString);
+    
+    // If invalid, try parsing as a Unix timestamp (milliseconds)
+    if (isNaN(date.getTime())) {
+      date = new Date(parseInt(dateString));
+    }
+
+    // If still invalid, return the raw string
+    if (isNaN(date.getTime())) {
+      console.log('Invalid date:', dateString); // Add this line for debugging
+      return dateString;
+    }
+
     const options = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    return date.toLocaleDateString('en-US', options);
   };
 
   const toggleExpand = () => {
@@ -30,7 +48,7 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
   };
 
   const MusicButtons = () => {
-    if (!audioFile) return null; // Add this line
+    if (!audioFile) return null;
 
     return (
       <div className="absolute top-2 right-2 flex space-x-2">
@@ -75,7 +93,7 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
                   ${category.toLowerCase() === 'music' ? 'cursor-default' : 'cursor-pointer'}
                   ${isExpanded ? 'expanded' : ''}`}
     >
-      {pinned && (
+      {pinned === 1 && (
         <div className="absolute top-2 left-2">
           <FaThumbtack className="text-blue-500 w-3 h-3" />
         </div>
@@ -85,8 +103,8 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
       
       <div className="card-summary">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-1">{title}</h2>
-        {subheading && (
-          <h3 className="text-xs sm:text-sm italic text-gray-600 dark:text-gray-400 mb-2">{subheading}</h3>
+        {subtitle && (
+          <h3 className="text-xs sm:text-sm italic text-gray-600 dark:text-gray-400 mb-2">{subtitle}</h3>
         )}
         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">{description}</p>
       </div>
@@ -106,7 +124,7 @@ const PostCard = ({ title, subheading, date, category, description, content, pin
       )}
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-gray-600 dark:text-gray-400 mt-3">
-        <span className="mb-2 sm:mb-0">{formatDate(date)}</span>
+        <span className="mb-2 sm:mb-0">{formatDate(datePublished)}</span>
         <div className="flex flex-wrap gap-1 sm:gap-2">
           {displayTags.map((tag, index) => (
             <button

@@ -1,39 +1,39 @@
-import { FaHome, FaBlog, FaNewspaper, FaMusic, FaRobot, FaBriefcase, FaGraduationCap, FaStickyNote } from 'react-icons/fa';
+import { FaHome, FaBlog, FaNewspaper, FaMusic, FaTools, FaBriefcase, FaGraduationCap, FaStickyNote } from 'react-icons/fa';
 
 export const categories = [
-  { id: 'home', name: 'Home', iconName: 'FaHome' },
-  { id: 'blog', name: 'Blog', iconName: 'FaBlog' },
-  { id: 'articles', name: 'Articles', iconName: 'FaNewspaper' },
-  { id: 'music', name: 'Music', iconName: 'FaMusic' },
-  { id: 'aiTools', name: 'AI Tools', iconName: 'FaRobot' },
-  { id: 'experience', name: 'Experience', iconName: 'FaBriefcase' },
-  { id: 'education', name: 'Education', iconName: 'FaGraduationCap' },
-  { id: 'notes', name: 'Notes', iconName: 'FaStickyNote' },
+  { id: 'home', name: 'Home', iconName: 'FaHome', subheader: 'Where Tech Meets Creativity' },
+  { id: 'blog', name: 'Blog', iconName: 'FaBlog', subheader: 'Musings from the Digital Frontier' },
+  { id: 'articles', name: 'Articles', iconName: 'FaNewspaper', subheader: 'Deep Dives into the Tech Ocean' },
+  { id: 'music', name: 'Music', iconName: 'FaMusic', subheader: 'Bytes and Beats in Perfect Harmony' },
+  { id: 'aiTools', name: 'AI Tools', iconName: 'FaRobot', subheader: 'Teaching Machines to Dream' },
+  { id: 'experience', name: 'Experience', iconName: 'FaBriefcase', subheader: 'Adventures in the Digital Realm' },
+  { id: 'education', name: 'Education', iconName: 'FaGraduationCap', subheader: 'Lifelong Learning in the Tech Era' },
+  { id: 'notes', name: 'Notes', iconName: 'FaStickyNote', subheader: 'Byte-sized Thoughts and Observations' },
 ];
 
 export function getCategories() {
   return categories;
 }
 
-export function getCategoryIcon(iconName) {
-  const iconSize = 24; // Increase this value to make icons larger
-  switch (iconName) {
-    case 'FaHome':
-      return <FaHome size={iconSize} />;
-    case 'FaBlog':
-      return <FaBlog size={iconSize} />;
-    case 'FaNewspaper':
-      return <FaNewspaper size={iconSize} />;
-    case 'FaMusic':
-      return <FaMusic size={iconSize} />;
-    case 'FaRobot':
-      return <FaRobot size={iconSize} />;
-    case 'FaBriefcase':
-      return <FaBriefcase size={iconSize} />;
-    case 'FaGraduationCap':
-      return <FaGraduationCap size={iconSize} />;
-    case 'FaStickyNote':
-      return <FaStickyNote size={iconSize} />;
+export function getCategoryIcon(category, size = '1em') {
+  const iconProps = { size };
+  switch (category.toLowerCase()) {
+    case 'home':
+      return <FaHome {...iconProps} />;
+    case 'blog':
+      return <FaBlog {...iconProps} />;
+    case 'articles':
+      return <FaNewspaper {...iconProps} />;
+    case 'music':
+      return <FaMusic {...iconProps} />;
+    case 'aitools':
+      return <FaTools {...iconProps} />;
+    case 'experience':
+      return <FaBriefcase {...iconProps} />;
+    case 'education':
+      return <FaGraduationCap {...iconProps} />;
+    case 'notes':
+      return <FaStickyNote {...iconProps} />;
     default:
       return null;
   }

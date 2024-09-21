@@ -13,15 +13,22 @@ export default function Sidebar({ categories = [] }) {
   return (
     <div className="w-16 bg-gray-200 dark:bg-gray-800 h-full flex flex-col justify-between items-center py-4">
       <ul className="space-y-8">
-        {categories && categories.length > 0 ? categories.map((category) => (
-          <li key={category.id} onMouseEnter={() => prefetchCategory(category.id)}>
-            <Link href={category.id === 'home' ? '/' : `/category/${category.id}`}>
+        <li onMouseEnter={() => prefetchCategory('home')}>
+          <Link href="/">
+            <span className="flex justify-center items-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              {getCategoryIcon('home', '1.5em')} {/* Increased size here */}
+            </span>
+          </Link>
+        </li>
+        {categories.filter(category => category !== 'home').map((category) => (
+          <li key={category} onMouseEnter={() => prefetchCategory(category)}>
+            <Link href={`/category/${category}`}>
               <span className="flex justify-center items-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                {getCategoryIcon(category.iconName)}
+                {getCategoryIcon(category, '1.5em')} {/* Increased size here */}
               </span>
             </Link>
           </li>
-        )) : null}
+        ))}
       </ul>
       <div className="mt-auto">
         <ThemeToggle />
