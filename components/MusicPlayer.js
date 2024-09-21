@@ -77,7 +77,7 @@ const MusicPlayer = ({ posts = [] }) => {
   };
 
   return (
-    <div className="w-full bg-gray-200 dark:bg-gray-700 p-4 rounded-lg mb-4 flex flex-col h-full">
+    <div className="flex flex-col items-center w-full">
       <div className="flex justify-center space-x-4 mb-4">
         {genreButtons.map(({ genre, icon }) => (
           <button 
@@ -93,11 +93,11 @@ const MusicPlayer = ({ posts = [] }) => {
       </div>
       
       <div className="flex items-center mb-4">
-        <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          <FaPlay size={24} />
+        <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+          <FaPlay size={20} />
         </div>
         <div className="flex-grow">
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+          <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-200">
             {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Set the mood above'}
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-400">AI Generated Music</p>
@@ -144,7 +144,7 @@ const MusicPlayer = ({ posts = [] }) => {
       {playlist.length > 0 && (
         <>
           <div className="flex-grow overflow-y-auto mb-4">
-            <ul className="text-sm text-gray-600 dark:text-gray-400">
+            <ul className="text-xs text-gray-600 dark:text-gray-400">
               {playlist.map((track, index) => (
                 <li 
                   key={index} 
@@ -153,18 +153,18 @@ const MusicPlayer = ({ posts = [] }) => {
                       ? 'bg-gray-300 dark:bg-gray-600 text-blue-500' 
                       : 'hover:bg-gray-100 dark:hover:bg-gray-500'}`}
                 >
+                  <button 
+                    onClick={() => removeFromPlaylist(index)}
+                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors mr-2"
+                  >
+                    <FaMinus size={12} />
+                  </button>
                   <span 
                     className="cursor-pointer flex-grow"
                     onClick={() => setCurrentTrack(index)}
                   >
                     {formatSongTitle(track.title)}
                   </span>
-                  <button 
-                    onClick={() => removeFromPlaylist(index)}
-                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <FaMinus size={12} />
-                  </button>
                 </li>
               ))}
             </ul>

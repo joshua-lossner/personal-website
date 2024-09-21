@@ -9,7 +9,7 @@ const Layout = ({ children, categories }) => {
       <div className="flex-grow overflow-auto">
         {children}
       </div>
-      <div className="w-80 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4 flex flex-col">
+      <div className="w-60 flex-shrink-0 bg-white dark:bg-gray-800 z-10 p-4 flex flex-col"> {/* Adjusted width from w-80 to w-60 */}
         <ErrorBoundary>
           <MusicPlayer />
         </ErrorBoundary>
