@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import PostCard from '../components/PostCard'
-import { getSortedPostsData } from '../lib/posts'
-import { getCategories } from '../utils/categories'
+import { getPosts } from '../lib/posts'
 import { useState } from 'react';
 
 export default function Home({ allPostsData = [] }) {
@@ -50,7 +49,7 @@ export default function Home({ allPostsData = [] }) {
               key={post.id} 
               title={post.title}
               subheading={post.subheading}
-              date={post.date} 
+              date={post.datePublished} // Change this line
               category={post.category} 
               description={post.description} 
               content={post.content}
@@ -68,24 +67,10 @@ export default function Home({ allPostsData = [] }) {
 }
 
 export async function getStaticProps() {
-  try {
-    const allPostsData = await getSortedPostsData()
-    const categories = getCategories() // We keep this for the Layout component
-    return {
-      props: {
-        allPostsData: allPostsData || [],
-        categories: categories || [],
-      },
-      revalidate: 60 * 5,
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return {
-      props: {
-        allPostsData: [],
-        categories: [],
-      },
-      revalidate: 60 * 5,
-    }
-  }
+  const posts = await getPosts();
+  return {
+    props: {
+      posts,
+    },
+  };
 }

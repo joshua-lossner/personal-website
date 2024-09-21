@@ -1,19 +1,43 @@
-require('dotenv').config({ path: '.env.local' });
+import dotenv from 'dotenv';
+import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import matter from 'gray-matter';
+import { openDb } from '../lib/db.js';
+
+dotenv.config({ path: '.env.local' });
 
 console.log('GitHub Username:', process.env.GITHUB_USERNAME);
 console.log('GitHub Repo:', process.env.GITHUB_REPO);
 console.log('GitHub Token:', process.env.GITHUB_TOKEN ? 'Set' : 'Not set');
-
-const axios = require('axios');
-const fs = require('fs').promises;
-const path = require('path');
-const matter = require('gray-matter');
 
 const githubUsername = process.env.GITHUB_USERNAME;
 const githubRepo = process.env.GITHUB_REPO;
 const githubToken = process.env.GITHUB_TOKEN;
 
 const localContentDir = path.join(process.cwd(), 'content');
+
+async function updateDatabase(post) {
+  const db = await openDb();
+  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, filePath } = post;
+  
+  await db.run(`
+    INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, filePath)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, filePath]);
+}
+
+async function processFile(filePath, content) {
+  const { data: metadata, content: markdownContent } = matter(content);
+  const post = {
+    ...metadata,
+    filePath: filePath.replace(localContentDir, ''),
+    content: markdownContent
+  };
+  
+  await fs.writeFile(path.join(localContentDir, filePath), content);
+  await updateDatabase(post);
+}
 
 async function fetchFilesRecursively(path = '') {
   const url = `https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${path}`;
@@ -51,7 +75,6 @@ async function clearLocalContentDir() {
 
 async function fetchAndStoreDocuments() {
   try {
-    // Clear the local content directory before fetching new files
     await clearLocalContentDir();
 
     const files = await fetchFilesRecursively();
@@ -59,12 +82,23 @@ async function fetchAndStoreDocuments() {
       const content = await fetchFileContent(file.path);
       const { data, content: markdownContent } = matter(content);
       
-      if (data.tags && data.tags.includes('personalWebsite')) {
-        // Ensure description is included in the frontmatter
-        if (!data.description) {
-          console.warn(`Warning: No description found for ${file.path}`);
-          data.description = 'No description available.';
+      // Check if the document is published
+      if (data.published === true) {
+        // Ensure all required fields are present
+        const requiredFields = ['title', 'category', 'description', 'datePublished'];
+        for (const field of requiredFields) {
+          if (!data[field]) {
+            console.warn(`Warning: Missing ${field} for ${file.path}`);
+            data[field] = 'No ' + field + ' available.';
+          }
         }
+
+        // Set default values for optional fields
+        data.subtitle = data.subtitle || '';
+        data.narration = data.narration || '';
+        data.audioFile = data.audioFile || '';
+        data.pinned = data.pinned || false;
+        data.tags = data.tags || [];
 
         const localPath = path.join(localContentDir, file.path);
         await fs.mkdir(path.dirname(localPath), { recursive: true });
@@ -72,10 +106,13 @@ async function fetchAndStoreDocuments() {
         // Reconstruct the file content with updated frontmatter
         const updatedContent = matter.stringify(markdownContent, data);
         await fs.writeFile(localPath, updatedContent);
-        console.log(`Stored: ${file.path}`);
+        await processFile(file.path, updatedContent);
+        console.log(`Stored and processed: ${file.path}`);
+      } else {
+        console.log(`Skipped unpublished document: ${file.path}`);
       }
     }
-    console.log('All documents fetched and stored successfully.');
+    console.log('All published documents fetched, stored, and processed successfully.');
   } catch (error) {
     console.error('Error fetching and storing documents:', error.message);
     if (error.response) {
@@ -85,4 +122,8 @@ async function fetchAndStoreDocuments() {
   }
 }
 
-fetchAndStoreDocuments();
+fetchAndStoreDocuments().then(() => {
+  console.log('Finished fetching and processing documents');
+}).catch(error => {
+  console.error('Error:', error);
+});
