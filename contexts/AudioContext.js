@@ -110,8 +110,8 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const newTrack = { title: audioFile, url: `/audio/song-library/${audioFile}` };
-    console.log('New track:', newTrack);
+    const audioUrl = audioFile; // Use the path as-is
+    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
     setPlaylist([newTrack]);
     setCurrentTrack(0);
     setIsPlaying(true);
@@ -127,16 +127,16 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const newTrack = { title: audioFile, url: `/audio/song-library/${audioFile}` };
-    setPlaylist(prev => {
-      const newPlaylist = [...prev, newTrack];
-      console.log('Updated playlist:', newPlaylist);
-      return newPlaylist;
-    });
-    // If nothing is playing, start playing the first track
-    if (!isPlaying && playlist.length === 0) {
+    const audioUrl = audioFile; // Use the path as-is
+    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
+    setPlaylist(prev => [...prev, newTrack]);
+    if (!isPlaying) {
       setIsPlaying(true);
       setCurrentTrack(0);
+      if (audioRef.current) {
+        audioRef.current.src = newTrack.url;
+        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+      }
     }
   };
 
@@ -146,20 +146,20 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const newTrack = { title: audioFile, url: `/audio/song-library/${audioFile}` };
-    setPlaylist(prev => {
-      const newPlaylist = [
-        ...prev.slice(0, currentTrack + 1),
-        newTrack,
-        ...prev.slice(currentTrack + 1)
-      ];
-      console.log('Updated playlist:', newPlaylist);
-      return newPlaylist;
-    });
-    // If nothing is playing, start playing the first track
+    const audioUrl = audioFile; // Use the path as-is
+    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
+    setPlaylist(prev => [
+      ...prev.slice(0, currentTrack + 1),
+      newTrack,
+      ...prev.slice(currentTrack + 1)
+    ]);
     if (!isPlaying && playlist.length === 0) {
       setIsPlaying(true);
       setCurrentTrack(0);
+      if (audioRef.current) {
+        audioRef.current.src = newTrack.url;
+        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+      }
     }
   };
 

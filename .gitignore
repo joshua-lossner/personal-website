@@ -45,5 +45,6 @@ Thumbs.db/public
 # Database 
 posts.db 
 
-# Ignore public folder
+# Ignore public folder except audio
 /public/
+!/public/audio/

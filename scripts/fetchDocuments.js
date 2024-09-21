@@ -29,10 +29,23 @@ async function updateDatabase(post) {
 
 async function processFile(filePath, content) {
   const { data: metadata, content: markdownContent } = matter(content);
+  
+  let audioFilePath = null;
+  if (metadata.audioFile) {
+    if (metadata.audioFile.startsWith('public/')) {
+      audioFilePath = '/' + metadata.audioFile.replace(/^public\//, '');
+    } else if (metadata.audioFile.startsWith('/')) {
+      audioFilePath = metadata.audioFile;
+    } else {
+      audioFilePath = '/' + metadata.audioFile;
+    }
+  }
+
   const post = {
     ...metadata,
     filePath: filePath.replace(localContentDir, ''),
-    content: markdownContent
+    content: markdownContent,
+    audioFile: audioFilePath,
   };
   
   console.log('Processing file:', filePath);

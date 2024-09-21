@@ -5,6 +5,7 @@ import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkBreaks from 'remark-breaks'; // Added remark-breaks plugin
 
 const MusicPlayer = ({ posts = [] }) => {
   const { 
@@ -103,6 +104,15 @@ const MusicPlayer = ({ posts = [] }) => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  const handlePlay = (index) => {
+    setCurrentTrack(index);
+    setIsPlaying(true);
+    if (audioRef.current) {
+      audioRef.current.src = playlist[index].url; // Use the URL as-is
+      audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
       <div className="flex justify-center space-x-4 mb-4"> {/* Increased margin-bottom from mb-2 to mb-4 */}
@@ -187,7 +197,7 @@ const MusicPlayer = ({ posts = [] }) => {
                 </button>
                 <span 
                   className="cursor-pointer flex-grow"
-                  onClick={() => setCurrentTrack(index)}
+                  onClick={() => handlePlay(index)}
                 >
                   {formatSongTitle(track.title)}
                 </span>
@@ -199,7 +209,7 @@ const MusicPlayer = ({ posts = [] }) => {
       
       <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+          remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks plugin
           rehypePlugins={[rehypeRaw]}
           className="prose dark:prose-invert max-w-none"
         >
