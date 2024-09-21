@@ -36,16 +36,16 @@ export default function Category({ initialCategory, initialPosts = [] }) {
   }
 
   return (
-    <main className="flex-grow flex flex-col overflow-hidden relative">
+    <div className="flex flex-col h-full">
       <Head>
         <title>{`${categoryData.name} - Joshua C. Lossner`}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
+      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 header-container">
         <div className="p-4">
           <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">Joshua C. Lossner</h1>
-          <h2 className="text-lg mb-2 text-gray-600 dark:text-gray-400">{categoryData.subheader}</h2>
+          <h2 className="text-lg text-gray-600 dark:text-gray-400">{categoryData.subheader}</h2>
         </div>
         {activeTag && (
           <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
@@ -59,8 +59,8 @@ export default function Category({ initialCategory, initialPosts = [] }) {
           </div>
         )}
       </div>
-      <div className="flex-grow overflow-y-auto scrollbar-hide">
-        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full">
+      <div className="flex-grow overflow-y-auto">
+        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
           {posts && posts.length > 0 ? (
             posts
               .sort((a, b) => {
@@ -87,7 +87,7 @@ export default function Category({ initialCategory, initialPosts = [] }) {
           )}
         </div>
       </div>
-    </main>
+    </div>
   )
 }
 

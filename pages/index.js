@@ -19,16 +19,16 @@ export default function Home({ initialPosts }) {
   };
 
   return (
-    <div className="flex-grow flex flex-col overflow-y-auto">
+    <div className="flex flex-col h-full">
       <Head>
         <title>Joshua C. Lossner - Personal Website</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
+      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 header-container">
         <div className="p-4">
           <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">Joshua C. Lossner</h1>
-          <h2 className="text-lg mb-2 text-gray-600 dark:text-gray-400">Where Tech Meets Creativity</h2>
+          <h2 className="text-lg text-gray-600 dark:text-gray-400">Where Tech Meets Creativity</h2>
         </div>
         {activeTag && (
           <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
@@ -42,31 +42,33 @@ export default function Home({ initialPosts }) {
           </div>
         )}
       </div>
-      <div className="p-4 space-y-4 max-w-3xl mx-auto w-full">
-        {posts && posts.length > 0 ? (
-          posts
-            .sort((a, b) => {
-              if (a.pinned && !b.pinned) return -1;
-              if (!a.pinned && b.pinned) return 1;
-              return new Date(b.datePublished) - new Date(a.datePublished);
-            })
-            .map((post) => (
-              <PostCard 
-                key={post.id} 
-                title={post.title}
-                subtitle={post.subtitle}
-                datePublished={post.datePublished}
-                category={post.category} 
-                description={post.description} 
-                content={post.content}
-                tags={post.tags}
-                onTagClick={handleTagClick}
-                audioFile={post.audioFile}
-              />
-            ))
-        ) : (
-          <p className="text-gray-600 dark:text-gray-400">No posts available.</p>
-        )}
+      <div className="flex-grow overflow-y-auto">
+        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
+          {posts && posts.length > 0 ? (
+            posts
+              .sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.datePublished) - new Date(a.datePublished);
+              })
+              .map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  title={post.title}
+                  subtitle={post.subtitle}
+                  datePublished={post.datePublished}
+                  category={post.category} 
+                  description={post.description} 
+                  content={post.content}
+                  tags={post.tags}
+                  onTagClick={handleTagClick}
+                  audioFile={post.audioFile}
+                />
+              ))
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">No posts available.</p>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -74,7 +76,6 @@ export default function Home({ initialPosts }) {
 
 export async function getStaticProps() {
   const { posts } = await getSortedPostsData();
-  console.log('Fetched posts:', posts.map(p => ({ title: p.title, contentLength: p.content?.length || 0 })));
   return {
     props: {
       initialPosts: posts,
