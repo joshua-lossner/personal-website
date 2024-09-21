@@ -104,14 +104,20 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const constructAudioUrl = (path) => {
+    const baseUrl = 'https://personal-website-audio.s3.amazonaws.com/audio';
+    return `${baseUrl}/${path.replace(/^\//, '')}`;
+  };
+
   const playSong = (audioFile) => {
     console.log('Playing song:', audioFile);
     if (!audioFile) {
       console.error('No audio file provided');
       return;
     }
-    const audioUrl = audioFile; // Use the path as-is
-    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
+    const audioUrl = constructAudioUrl(audioFile); // Construct and escape URL
+    console.log('Constructed audio URL:', audioUrl); // Log the constructed URL
+    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl }; // Decode title for display
     setPlaylist([newTrack]);
     setCurrentTrack(0);
     setIsPlaying(true);
@@ -127,8 +133,9 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const audioUrl = audioFile; // Use the path as-is
-    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
+    const audioUrl = constructAudioUrl(audioFile); // Construct and escape URL
+    console.log('Constructed audio URL:', audioUrl); // Log the constructed URL
+    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl }; // Decode title for display
     setPlaylist(prev => [...prev, newTrack]);
     if (!isPlaying) {
       setIsPlaying(true);
@@ -146,8 +153,9 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const audioUrl = audioFile; // Use the path as-is
-    const newTrack = { title: audioUrl.split('/').pop(), url: audioUrl };
+    const audioUrl = constructAudioUrl(audioFile); // Construct and escape URL
+    console.log('Constructed audio URL:', audioUrl); // Log the constructed URL
+    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl }; // Decode title for display
     setPlaylist(prev => [
       ...prev.slice(0, currentTrack + 1),
       newTrack,
