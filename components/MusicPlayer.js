@@ -27,6 +27,7 @@ const MusicPlayer = ({ posts = [] }) => {
 
   const [progress, setProgress] = useState(0);
   const [activeGenre, setActiveGenre] = useState(null);
+  const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png'); // Default album art
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -38,6 +39,24 @@ const MusicPlayer = ({ posts = [] }) => {
     audio.addEventListener('timeupdate', updateProgress);
     return () => audio.removeEventListener('timeupdate', updateProgress);
   }, [audioRef]);
+
+  useEffect(() => {
+    if (playlist.length > 0) {
+      const currentSong = playlist[currentTrack];
+      const artPath = `/album-art/${currentSong.title.replace('.mp3', '')}.png`; // Construct path for album art
+      fetch(artPath)
+        .then(response => {
+          if (response.ok) {
+            setAlbumArt(artPath); // Set album art if it exists
+          } else {
+            setAlbumArt('/album-art/default-album-art.png'); // Set default if not found
+          }
+        })
+        .catch(() => setAlbumArt('/album-art/default-album-art.png')); // Fallback to default on error
+    } else {
+      setAlbumArt('/album-art/default-album-art.png'); // Reset to default if no track
+    }
+  }, [currentTrack, playlist]);
 
   const genreButtons = [
     { genre: 'ambient', icon: <FaWaveSquare size={20} /> },
@@ -93,9 +112,7 @@ const MusicPlayer = ({ posts = [] }) => {
       </div>
       
       <div className="flex items-center mb-4">
-        <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
-          <FaPlay size={20} />
-        </div>
+        <img src={albumArt} alt="Album Art" className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0" /> {/* Display album art instead of play symbol */}
         <div className="flex-grow">
           <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-200">
             {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Set the mood above'}

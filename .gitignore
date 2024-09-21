@@ -44,3 +44,6 @@ Thumbs.db/public
 
 # Database 
 posts.db 
+
+# Ignore public folder
+/public/
