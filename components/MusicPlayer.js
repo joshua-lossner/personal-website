@@ -79,7 +79,7 @@ const MusicPlayer = ({ posts = [] }) => {
   };
 
   const formatSongTitle = (title) => {
-    return title ? title.replace('.mp3', '') : 'Set the mood above';
+    return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
   };
 
   const getCurrentLyrics = () => {

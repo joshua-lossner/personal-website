@@ -21,7 +21,7 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
     setIsExpanded(!isExpanded);
   };
 
-  const MusicButtons = () => {
+  const AudioButtons = () => {
     if (!audioFile) return null;
     return (
       <div className="absolute top-2 right-2 flex space-x-2">
@@ -38,29 +38,34 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
     );
   };
 
+  // Check if there's additional content beyond the front matter
+  const hasAdditionalContent = content.trim() !== '';
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 transition-all duration-300 ease-in-out hover:shadow-lg relative">
-      {category.toLowerCase() === 'music' && <MusicButtons />}
+      <AudioButtons />
       
-      <div onClick={toggleExpand} className="cursor-pointer">
+      <div className={hasAdditionalContent ? "cursor-pointer" : ""} onClick={hasAdditionalContent ? toggleExpand : undefined}>
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-1">{title}</h2>
         {subtitle && (
           <h3 className="text-xs sm:text-sm italic text-gray-600 dark:text-gray-400 mb-2">{subtitle}</h3>
         )}
         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">{description}</p>
         
-        <button 
-          onClick={toggleExpand} 
-          className="text-blue-500 hover:text-blue-600 transition-colors duration-200 flex items-center"
-        >
-          {isExpanded ? 'Read Less' : 'Read More'}
-          {isExpanded ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
-        </button>
+        {hasAdditionalContent && (
+          <button 
+            onClick={toggleExpand} 
+            className="text-blue-500 hover:text-blue-600 transition-colors duration-200 flex items-center"
+          >
+            {isExpanded ? 'Read Less' : 'Read More'}
+            {isExpanded ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
+          </button>
+        )}
       </div>
 
-      {isExpanded && (
+      {isExpanded && hasAdditionalContent && (
         <div className="mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-inner transition-all duration-300 ease-in-out">
-          <div className="prose dark:prose-invert max-w-none custom-article-typography">
+          <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
             <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
               {content}
             </ReactMarkdown>
