@@ -9,6 +9,7 @@ export default function Category({ initialCategory, initialPosts = [] }) {
   const router = useRouter();
   const [category, setCategory] = useState(initialCategory);
   const [posts, setPosts] = useState(initialPosts);
+  const [activeTag, setActiveTag] = useState(null);
 
   useEffect(() => {
     if (router.query.id) {
@@ -18,6 +19,17 @@ export default function Category({ initialCategory, initialPosts = [] }) {
   }, [router.query.id, initialPosts]);
 
   const categoryData = categories.find(c => c.id === category) || categories[0];
+
+  const handleTagClick = (tag) => {
+    if (activeTag === tag) {
+      setPosts(initialPosts);
+      setActiveTag(null);
+    } else {
+      const filteredPosts = initialPosts.filter(post => post.tags && post.tags.includes(tag));
+      setPosts(filteredPosts);
+      setActiveTag(tag);
+    }
+  };
 
   if (router.isFallback) {
     return <div>Loading...</div>
@@ -35,24 +47,41 @@ export default function Category({ initialCategory, initialPosts = [] }) {
           <h1 className="text-3xl font-bold mb-1 text-gray-900 dark:text-white">Joshua C. Lossner</h1>
           <h2 className="text-lg mb-2 text-gray-600 dark:text-gray-400">{categoryData.subheader}</h2>
         </div>
+        {activeTag && (
+          <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+            Showing posts tagged with: {activeTag}
+            <button 
+              onClick={() => handleTagClick(activeTag)} 
+              className="ml-2 text-blue-600 dark:text-blue-300 hover:underline"
+            >
+              Clear filter
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex-grow overflow-y-auto scrollbar-hide">
         <div className="p-4 space-y-4 max-w-3xl mx-auto w-full">
           {posts && posts.length > 0 ? (
-            posts.sort((a, b) => b.pinned - a.pinned || new Date(b.datePublished) - new Date(a.datePublished)).map((post) => (
-              <PostCard 
-                key={post.id} 
-                title={post.title}
-                subtitle={post.subtitle}
-                datePublished={post.datePublished}
-                category={post.category} 
-                description={post.description} 
-                content={post.content}
-                pinned={post.pinned}
-                tags={post.tags}
-                audioFile={post.audioFile}
-              />
-            ))
+            posts
+              .sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.datePublished) - new Date(a.datePublished);
+              })
+              .map((post) => (
+                <PostCard 
+                  key={post.id} 
+                  title={post.title}
+                  subtitle={post.subtitle}
+                  datePublished={post.datePublished}
+                  category={post.category} 
+                  description={post.description} 
+                  content={post.content}
+                  tags={post.tags}
+                  onTagClick={handleTagClick}
+                  audioFile={post.audioFile}
+                />
+              ))
           ) : (
             <p className="text-gray-600 dark:text-gray-400">No posts available in this category.</p>
           )}
@@ -76,6 +105,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const category = params.id === 'home' ? null : params.id;
   const { posts } = await getSortedPostsData(category);
+  console.log('Fetched posts:', posts.map(p => ({ title: p.title, contentLength: p.content?.length || 0 })));
 
   return {
     props: {

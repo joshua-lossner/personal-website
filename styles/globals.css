@@ -115,18 +115,32 @@
 
 .prose {
   @apply text-gray-600 dark:text-gray-400;
+  max-width: 65ch;
+  color: inherit;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  @apply text-gray-900 dark:text-gray-200;
+.prose a {
+  color: #3b82f6;
+}
+
+.prose a:hover {
+  color: #2563eb;
+}
+
+.dark .prose {
+  color: #d1d5db;
+}
+
+.dark .prose a {
+  color: #60a5fa;
+}
+
+.dark .prose a:hover {
+  color: #93c5fd;
 }
 
 .prose strong {
   @apply text-gray-900 dark:text-gray-200;
-}
-
-.prose a {
-  @apply text-blue-600 dark:text-blue-400;
 }
 
 .prose ul, .prose ol {
@@ -180,4 +194,8 @@
 
 .music-player-carousel button.active {
   opacity: 1;
+}
+
+.music-button {
+  @apply w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200;
 }

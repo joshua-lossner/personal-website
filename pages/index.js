@@ -44,21 +44,26 @@ export default function Home({ initialPosts }) {
       </div>
       <div className="p-4 space-y-4 max-w-3xl mx-auto w-full">
         {posts && posts.length > 0 ? (
-          posts.sort((a, b) => b.pinned - a.pinned || new Date(b.datePublished) - new Date(a.datePublished)).map((post) => (
-            <PostCard 
-              key={post.id} 
-              title={post.title}
-              subtitle={post.subtitle}
-              datePublished={post.datePublished}
-              category={post.category} 
-              description={post.description} 
-              content={post.content}
-              pinned={post.pinned} 
-              tags={post.tags}
-              onTagClick={handleTagClick}
-              audioFile={post.audioFile}
-            />
-          ))
+          posts
+            .sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return new Date(b.datePublished) - new Date(a.datePublished);
+            })
+            .map((post) => (
+              <PostCard 
+                key={post.id} 
+                title={post.title}
+                subtitle={post.subtitle}
+                datePublished={post.datePublished}
+                category={post.category} 
+                description={post.description} 
+                content={post.content}
+                tags={post.tags}
+                onTagClick={handleTagClick}
+                audioFile={post.audioFile}
+              />
+            ))
         ) : (
           <p className="text-gray-600 dark:text-gray-400">No posts available.</p>
         )}
@@ -69,6 +74,7 @@ export default function Home({ initialPosts }) {
 
 export async function getStaticProps() {
   const { posts } = await getSortedPostsData();
+  console.log('Fetched posts:', posts.map(p => ({ title: p.title, contentLength: p.content?.length || 0 })));
   return {
     props: {
       initialPosts: posts,
