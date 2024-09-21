@@ -28,12 +28,14 @@ const MusicPlayer = ({ posts = [] }) => {
   const [progress, setProgress] = useState(0);
   const [activeGenre, setActiveGenre] = useState(null);
   const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png'); // Default album art
+  const [duration, setDuration] = useState(0); // Track duration
 
   useEffect(() => {
     const audio = audioRef.current;
     const updateProgress = () => {
       if (audio.duration) {
         setProgress((audio.currentTime / audio.duration) * 100);
+        setDuration(audio.duration); // Update duration
       }
     };
     audio.addEventListener('timeupdate', updateProgress);
@@ -95,9 +97,15 @@ const MusicPlayer = ({ posts = [] }) => {
     setProgress(e.target.value);
   };
 
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="flex justify-center space-x-4 mb-4">
+      <div className="flex justify-center space-x-4 mb-2"> {/* Reduced margin */}
         {genreButtons.map(({ genre, icon }) => (
           <button 
             key={genre} 
@@ -111,8 +119,8 @@ const MusicPlayer = ({ posts = [] }) => {
         ))}
       </div>
       
-      <div className="flex items-center mb-4">
-        <img src={albumArt} alt="Album Art" className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0" /> {/* Display album art instead of play symbol */}
+      <div className="flex items-center mb-2"> {/* Reduced margin */}
+        <img src={albumArt} alt="Album Art" className="w-14 h-14 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0" /> {/* Increased size by 20% */}
         <div className="flex-grow">
           <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-200">
             {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Set the mood above'}
@@ -121,18 +129,7 @@ const MusicPlayer = ({ posts = [] }) => {
         </div>
       </div>
       
-      <div className="flex items-center mb-4">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={progress}
-          onChange={handleSeek}
-          className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full appearance-none cursor-pointer"
-        />
-      </div>
-      
-      <div className="flex justify-center items-center mb-4">
+      <div className="flex justify-center items-center mb-2"> {/* Reduced margin */}
         <div className="flex items-center space-x-3">
           <button 
             onClick={toggleShuffle} 
@@ -157,46 +154,58 @@ const MusicPlayer = ({ posts = [] }) => {
           </button>
         </div>
       </div>
+
+      <div className="flex items-center mb-4"> {/* Adjusted margin */}
+        <span className="text-xs text-gray-600 dark:text-gray-400 mr-2">{formatTime(audioRef.current?.currentTime || 0)}</span> {/* Current time */}
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={progress}
+          onChange={handleSeek}
+          className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full appearance-none cursor-pointer"
+        />
+        <span className="text-xs text-gray-600 dark:text-gray-400 ml-2">{formatTime(duration)}</span> {/* Total duration */}
+      </div>
       
-      {playlist.length > 0 && (
-        <>
-          <div className="flex-grow overflow-y-auto mb-4">
-            <ul className="text-xs text-gray-600 dark:text-gray-400">
-              {playlist.map((track, index) => (
-                <li 
-                  key={index} 
-                  className={`flex justify-between items-center p-2 rounded transition-all duration-200
-                    ${index === currentTrack 
-                      ? 'bg-gray-300 dark:bg-gray-600 text-blue-500' 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-500'}`}
+      {playlist.length > 0 && ( // Conditional rendering for playlist
+        <div className="flex-grow overflow-y-auto mb-4 bg-gray-100 dark:bg-gray-700 p-2 rounded"> {/* Subtle background for playlist */}
+          <ul className="text-xs text-gray-600 dark:text-gray-400">
+            {playlist.map((track, index) => (
+              <li 
+                key={index} 
+                className={`flex justify-between items-center p-2 rounded transition-all duration-200
+                  ${index === currentTrack 
+                    ? 'bg-gray-300 dark:bg-gray-600 text-blue-500' 
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-500'}`}
+              >
+                <button 
+                  onClick={() => removeFromPlaylist(index)}
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors mr-2"
                 >
-                  <button 
-                    onClick={() => removeFromPlaylist(index)}
-                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors mr-2"
-                  >
-                    <FaMinus size={12} />
-                  </button>
-                  <span 
-                    className="cursor-pointer flex-grow"
-                    onClick={() => setCurrentTrack(index)}
-                  >
-                    {formatSongTitle(track.title)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-              className="prose dark:prose-invert max-w-none"
-            >
-              {getCurrentLyrics()}
-            </ReactMarkdown>
-          </div>
-        </>
+                  <FaMinus size={12} />
+                </button>
+                <span 
+                  className="cursor-pointer flex-grow"
+                  onClick={() => setCurrentTrack(index)}
+                >
+                  {formatSongTitle(track.title)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+      
+      <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+          className="prose dark:prose-invert max-w-none"
+        >
+          {getCurrentLyrics()}
+        </ReactMarkdown>
+      </div>
     </div>
   );
 };
