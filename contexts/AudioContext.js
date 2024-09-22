@@ -81,7 +81,7 @@ export const AudioProvider = ({ children }) => {
 
   const loadPlaylist = async (genre) => {
     try {
-      const response = await fetch(`/api/music?directory=${genre}`);
+      const response = await fetch(`/api/music-by-tag?tag=${genre}`);
       const data = await response.json();
       if (Array.isArray(data.playlist) && data.playlist.length > 0) {
         console.log('Loaded playlist:', data.playlist);
@@ -89,7 +89,7 @@ export const AudioProvider = ({ children }) => {
         setCurrentTrack(0);
         setIsPlaying(true);
         if (audioRef.current) {
-          audioRef.current.src = `/audio/site-playlist/${genre}/${data.playlist[0].title}`; // Updated path
+          audioRef.current.src = data.playlist[0].url;
           audioRef.current.play().catch(error => console.error('Error playing audio:', error));
         }
       } else {

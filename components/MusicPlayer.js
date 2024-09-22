@@ -62,16 +62,16 @@ const MusicPlayer = ({ posts = [] }) => {
   }, [currentTrack, playlist]);
 
   const genreButtons = [
-    { genre: 'ambient', icon: <FaWaveSquare size={20} /> },
-    { genre: 'classical', icon: <GiGrandPiano size={20} /> },
-    { genre: 'jazz', icon: <GiSaxophone size={20} /> },
-    { genre: 'none', icon: <FaVolumeMute size={20} /> },
+    { genre: 'alternative', icon: <FaWaveSquare size={20} /> },
+    { genre: 'hardrock', icon: <GiGrandPiano size={20} /> },
+    { genre: 'classical', icon: <GiSaxophone size={20} /> },
+    { genre: 'jazz', icon: <FaVolumeMute size={20} /> },
   ];
 
-  const handleGenreClick = (genre) => {
+  const handleGenreClick = async (genre) => {
     console.log('Genre clicked:', genre);
     if (genre !== 'none') {
-      loadPlaylist(genre);
+      await loadPlaylist(genre);
       setActiveGenre(genre);
     } else {
       stopAndClearPlaylist();
