@@ -9,7 +9,16 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [isShuffled, setIsShuffled] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'all', 'one'
+  const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState('');
   const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Fetch the S3_BASE_URL_ALBUMS from the server
+    fetch('/api/get-s3-url')
+      .then(response => response.json())
+      .then(data => setS3BaseUrlAlbums(data.S3_BASE_URL_ALBUMS))
+      .catch(error => console.error('Error fetching S3_BASE_URL_ALBUMS:', error));
+  }, []);
 
   useEffect(() => {
     if (playlist.length > 0 && audioRef.current) {
@@ -219,7 +228,8 @@ export const AudioProvider = ({ children }) => {
       toggleShuffle,
       repeatMode,
       toggleRepeat,
-      stopAndClearPlaylist
+      stopAndClearPlaylist,
+      S3_BASE_URL_ALBUMS
     }}>
       {children}
       <audio 

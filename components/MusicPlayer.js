@@ -23,7 +23,8 @@ const MusicPlayer = ({ posts = [] }) => {
     toggleRepeat,
     isShuffled,
     repeatMode,
-    stopAndClearPlaylist
+    stopAndClearPlaylist,
+    S3_BASE_URL_ALBUMS
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
@@ -46,20 +47,22 @@ const MusicPlayer = ({ posts = [] }) => {
   useEffect(() => {
     if (playlist.length > 0) {
       const currentSong = playlist[currentTrack];
-      const artPath = `/album-art/${currentSong.title.replace('.mp3', '')}.png`; // Construct path for album art
-      fetch(artPath)
-        .then(response => {
-          if (response.ok) {
-            setAlbumArt(artPath); // Set album art if it exists
-          } else {
-            setAlbumArt('/album-art/default-album-art.png'); // Set default if not found
-          }
-        })
-        .catch(() => setAlbumArt('/album-art/default-album-art.png')); // Fallback to default on error
+      const artFileName = encodeURIComponent(currentSong.title.replace('.mp3', '').trim()) + '.png';
+      const artPath = `${S3_BASE_URL_ALBUMS}/${artFileName}`;
+      setAlbumArt(artPath);
+      console.log('Album art URL:', artPath); // Log the constructed URL
+      
+      // Optionally, you can add an image error handler
+      const img = new Image();
+      img.onerror = () => {
+        console.error('Failed to load album art:', artPath);
+        setAlbumArt(`${S3_BASE_URL_ALBUMS}/default-album-art.png`);
+      };
+      img.src = artPath;
     } else {
-      setAlbumArt('/album-art/default-album-art.png'); // Reset to default if no track
+      setAlbumArt(`${S3_BASE_URL_ALBUMS}/default-album-art.png`);
     }
-  }, [currentTrack, playlist]);
+  }, [currentTrack, playlist, S3_BASE_URL_ALBUMS]);
 
   const genreButtons = [
     { genre: 'alternative', icon: <FaWaveSquare size={20} /> },
