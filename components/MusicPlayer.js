@@ -114,7 +114,7 @@ const MusicPlayer = ({ posts = [] }) => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-start w-full">
       <div className="flex justify-center space-x-4 mb-4"> {/* Increased margin-bottom from mb-2 to mb-4 */}
         {genreButtons.map(({ genre, icon }) => (
           <button 
@@ -129,7 +129,7 @@ const MusicPlayer = ({ posts = [] }) => {
         ))}
       </div>
       
-      <div className="flex items-center mb-2"> {/* Reduced margin */}
+      <div className="flex items-center mb-2 w-full"> {/* Reduced margin */}
         <img src={albumArt} alt="Album Art" className="w-14 h-14 bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0" /> {/* Increased size by 20% */}
         <div className="flex-grow">
           <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-200">
@@ -139,18 +139,18 @@ const MusicPlayer = ({ posts = [] }) => {
         </div>
       </div>
       
-      <div className="flex justify-center items-center mb-2"> {/* Reduced margin */}
-        <div className="flex items-center space-x-3">
+      <div className="flex items-center mb-2 w-full"> {/* Reduced margin */}
+        <div className="flex items-center space-x-2">
           <button 
             onClick={toggleShuffle} 
-            className={`p-1.5 rounded-full ${isShuffled ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300'} hover:bg-blue-600 hover:text-white transition-colors`}
+            className={`p-1 rounded-full ${isShuffled ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300'} hover:bg-blue-600 hover:text-white transition-colors`}
           >
             <FaRandom size={11} />
           </button>
           <button onClick={prevTrack} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
             <FaStepBackward size={15} />
           </button>
-          <button onClick={playPause} className="w-9 h-9 flex items-center justify-center bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors">
+          <button onClick={playPause} className="w-7 h-7 flex items-center justify-center bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors">
             {isPlaying ? <FaPause size={15} /> : <FaPlay size={15} />}
           </button>
           <button onClick={nextTrack} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
@@ -158,14 +158,14 @@ const MusicPlayer = ({ posts = [] }) => {
           </button>
           <button 
             onClick={toggleRepeat} 
-            className={`p-1.5 rounded-full ${repeatMode !== 'off' ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300'} hover:bg-blue-600 hover:text-white transition-colors`}
+            className={`p-1 rounded-full ${repeatMode !== 'off' ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300'} hover:bg-blue-600 hover:text-white transition-colors`}
           >
             <FaRedo size={11} />
           </button>
         </div>
       </div>
 
-      <div className="flex items-center mb-4"> {/* Adjusted margin */}
+      <div className="flex items-center mb-4 w-full"> {/* Adjusted margin */}
         <span className="text-xs text-gray-600 dark:text-gray-400 mr-2">{formatTime(audioRef.current?.currentTime || 0)}</span> {/* Current time */}
         <input
           type="range"
@@ -179,7 +179,7 @@ const MusicPlayer = ({ posts = [] }) => {
       </div>
       
       {playlist.length > 0 && ( // Conditional rendering for playlist
-        <div className="flex-grow overflow-y-auto mb-4 bg-gray-100 dark:bg-gray-700 p-2 rounded"> {/* Subtle background for playlist */}
+        <div className="flex-grow overflow-y-auto mb-4 bg-gray-100 dark:bg-gray-700 p-2 rounded w-full"> {/* Subtle background for playlist */}
           <ul className="text-xs text-gray-600 dark:text-gray-400">
             {playlist.map((track, index) => (
               <li 
@@ -196,7 +196,7 @@ const MusicPlayer = ({ posts = [] }) => {
                   <FaMinus size={12} />
                 </button>
                 <span 
-                  className="cursor-pointer flex-grow"
+                  className="cursor-pointer flex-grow text-left"
                   onClick={() => handlePlay(index)}
                 >
                   {formatSongTitle(track.title)}
@@ -207,7 +207,7 @@ const MusicPlayer = ({ posts = [] }) => {
         </div>
       )}
       
-      <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto">
+      <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 max-h-60 overflow-y-auto w-full">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks]} // Added remarkBreaks plugin
           rehypePlugins={[rehypeRaw]}
