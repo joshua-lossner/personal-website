@@ -19,12 +19,12 @@ const localContentDir = path.join(process.cwd(), 'content');
 
 async function updateDatabase(post) {
   const db = await openDb();
-  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, filePath } = post;
+  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath } = post;
   
   await db.run(`
-    INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, filePath)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, filePath]);
+    INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, hidden ? 1 : 0, filePath]);
 }
 
 async function processFile(filePath, content) {
@@ -46,6 +46,7 @@ async function processFile(filePath, content) {
     filePath: filePath.replace(localContentDir, ''),
     content: markdownContent,
     audioFile: audioFilePath,
+    hidden: metadata.hidden || false, // Add this line
   };
   
   console.log('Processing file:', filePath);
