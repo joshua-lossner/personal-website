@@ -24,7 +24,8 @@ const MusicPlayer = ({ posts = [] }) => {
     isShuffled,
     repeatMode,
     stopAndClearPlaylist,
-    S3_BASE_URL_ALBUMS
+    S3_BASE_URL_ALBUMS,
+    setIsPlaying  // Add this line to destructure setIsPlaying
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
@@ -110,10 +111,8 @@ const MusicPlayer = ({ posts = [] }) => {
   const handlePlay = (index) => {
     setCurrentTrack(index);
     setIsPlaying(true);
-    if (audioRef.current) {
-      audioRef.current.src = playlist[index].url; // Use the URL as-is
-      audioRef.current.play().catch(error => console.error('Error playing audio:', error));
-    }
+    // Removed direct manipulation of audioRef.current
+    // The AudioContext will handle updating the audio source and playback
   };
 
   return (

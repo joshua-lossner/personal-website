@@ -12,7 +12,8 @@ const DynamicMusicPlayer = () => {
   const { 
     playlist, 
     currentTrack, 
-    isPlaying, 
+    isPlaying,
+    setIsPlaying,  // Add this line to destructure setIsPlaying
     playPause, 
     nextTrack, 
     prevTrack, 
@@ -202,7 +203,10 @@ const DynamicMusicPlayer = () => {
                 </button>
                 <span 
                   className="cursor-pointer flex-grow text-left"
-                  onClick={() => setCurrentTrack(index)}
+                  onClick={() => {
+                    setCurrentTrack(index);
+                    setIsPlaying(true);  // Ensure the song starts playing
+                  }}
                 >
                   {formatSongTitle(track.title)}
                 </span>

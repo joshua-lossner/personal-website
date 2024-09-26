@@ -229,7 +229,8 @@ export const AudioProvider = ({ children }) => {
       repeatMode,
       toggleRepeat,
       stopAndClearPlaylist,
-      S3_BASE_URL_ALBUMS
+      S3_BASE_URL_ALBUMS,
+      setIsPlaying  // Add this line to expose setIsPlaying
     }}>
       {children}
       <audio 
