@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo, FaList } from 'react-icons/fa';
 import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -26,6 +26,7 @@ const DynamicMusicPlayerContent = () => {
   const [progress, setProgress] = useState(0);
   const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png');
   const [duration, setDuration] = useState(0);
+  const [showPlaylist, setShowPlaylist] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -81,6 +82,10 @@ const DynamicMusicPlayerContent = () => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  const togglePlaylist = () => {
+    setShowPlaylist(!showPlaylist);
+  };
+
   return (
     <div className="w-full bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
       <div className="flex items-center mb-4">
@@ -115,6 +120,9 @@ const DynamicMusicPlayerContent = () => {
         <button onClick={toggleRepeat} className={`text-sm ${repeatMode !== 'off' ? 'text-blue-500' : 'text-gray-500'}`}>
           <FaRedo />
         </button>
+        <button onClick={togglePlaylist} className={`text-sm ${showPlaylist ? 'text-blue-500' : 'text-gray-500'}`}>
+          <FaList />
+        </button>
       </div>
 
       <div className="mb-4">
@@ -141,6 +149,23 @@ const DynamicMusicPlayerContent = () => {
           {getCurrentLyrics()}
         </ReactMarkdown>
       </div>
+
+      {showPlaylist && playlist.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold mb-2">Playlist</h3>
+          <ul className="text-xs text-gray-600 dark:text-gray-400">
+            {playlist.map((track, index) => (
+              <li 
+                key={index}
+                className={`cursor-pointer p-2 rounded ${index === currentTrack ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                onClick={() => setCurrentTrack(index)}
+              >
+                {formatSongTitle(track.title)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaWaveSquare, FaRandom, FaRedo, FaMinus, FaVolumeMute } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaWaveSquare, FaRandom, FaRedo, FaMinus, FaVolumeMute, FaList } from 'react-icons/fa';
 import { GiGrandPiano, GiSaxophone } from 'react-icons/gi';
 import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
@@ -32,6 +32,7 @@ const MusicPlayer = ({ posts = [] }) => {
   const [activeGenre, setActiveGenre] = useState(null);
   const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png'); // Default album art
   const [duration, setDuration] = useState(0); // Track duration
+  const [showPlaylist, setShowPlaylist] = useState(false); // Add this state
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -115,6 +116,10 @@ const MusicPlayer = ({ posts = [] }) => {
     // The AudioContext will handle updating the audio source and playback
   };
 
+  const togglePlaylist = () => {
+    setShowPlaylist(!showPlaylist);
+  };
+
   return (
     <div className="flex flex-col items-start w-full">
       <div className="flex justify-center space-x-4 mb-4"> {/* Increased margin-bottom from mb-2 to mb-4 */}
@@ -164,6 +169,12 @@ const MusicPlayer = ({ posts = [] }) => {
           >
             <FaRedo size={11} />
           </button>
+          <button 
+            onClick={togglePlaylist}
+            className={`p-1 rounded-full ${showPlaylist ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300'} hover:bg-blue-600 hover:text-white transition-colors`}
+          >
+            <FaList size={11} />
+          </button>
         </div>
       </div>
 
@@ -180,7 +191,7 @@ const MusicPlayer = ({ posts = [] }) => {
         <span className="text-xs text-gray-600 dark:text-gray-400 ml-2">{formatTime(duration)}</span> {/* Total duration */}
       </div>
       
-      {playlist.length > 0 && ( // Conditional rendering for playlist
+      {showPlaylist && playlist.length > 0 && ( // Conditional rendering for playlist
         <div className="flex-grow overflow-y-auto mb-4 bg-gray-100 dark:bg-gray-700 p-2 rounded w-full"> {/* Subtle background for playlist */}
           <ul className="text-xs text-gray-600 dark:text-gray-400">
             {playlist.map((track, index) => (
