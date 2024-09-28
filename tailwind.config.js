@@ -77,6 +77,10 @@ module.exports = {
           },
         },
       }),
+      screens: {
+        'md': '768px',
+        // ... other screen sizes
+      },
     },
   },
   plugins: [

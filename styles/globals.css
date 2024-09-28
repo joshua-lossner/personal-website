@@ -273,3 +273,40 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ... (keep other existing styles) */
+
+/* Add these new styles for responsive sidebar */
+@media (max-width: 768px) {
+  .sidebar-open {
+    overflow: hidden;
+  }
+
+  .sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Add these styles at the end of your globals.css file */
+
+@media (max-width: 768px) {
+  nav {
+    height: 4rem; /* Set a fixed height for the mobile nav */
+  }
+
+  nav ul {
+    flex-direction: row;
+    justify-content: space-around;
+    height: 100%;
+  }
+
+  nav ul li {
+    margin-bottom: 0;
+  }
+
+  /* Remove this class as we're handling padding in the Layout component
+  .content-area {
+    padding-top: 4rem;
+  }
+  */
+}
+
+/* Remove any conflicting styles for nav ul and nav ul li */
