@@ -10,38 +10,55 @@ export const AudioProvider = ({ children }) => {
   const [isShuffled, setIsShuffled] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'all', 'one'
   const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState('');
-  const audioRef = useRef(null);
+  const [audioElement, setAudioElement] = useState(null);
+  const [radioStations, setRadioStations] = useState([
+    { id: 1, name: "Jazz FM", url: "http://example.com/jazz-fm-stream" },
+    { id: 2, name: "Classical Vibes", url: "http://example.com/classical-vibes-stream" },
+    { id: 3, name: "Rock Radio", url: "http://example.com/rock-radio-stream" },
+    { id: 4, name: "Chill Lounge", url: "http://example.com/chill-lounge-stream" },
+    { id: 5, name: "Electronic Beats", url: "http://example.com/electronic-beats-stream" },
+  ]);
+  const [currentRadioStation, setCurrentRadioStation] = useState(null);
 
   useEffect(() => {
-    // Fetch the S3_BASE_URL_ALBUMS from the server
-    fetch('/api/get-s3-url')
-      .then(response => response.json())
-      .then(data => setS3BaseUrlAlbums(data.S3_BASE_URL_ALBUMS))
-      .catch(error => console.error('Error fetching S3_BASE_URL_ALBUMS:', error));
+    if (typeof window !== 'undefined') {
+      setAudioElement(new Audio());
+    }
   }, []);
 
   useEffect(() => {
-    if (playlist.length > 0 && audioRef.current) {
-      audioRef.current.src = playlist[currentTrack].url;
+    if (playlist.length > 0 && audioElement) {
+      audioElement.src = playlist[currentTrack].url;
       if (isPlaying) {
-        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
       }
     }
   }, [currentTrack, isPlaying]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
+    if (audioElement) {
+      audioElement.volume = volume;
     }
   }, [volume]);
 
   const playPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(error => console.error('Error playing audio:', error));
-    }
-    setIsPlaying(!isPlaying);
+    return new Promise((resolve, reject) => {
+      if (isPlaying) {
+        audioElement.pause();
+        setIsPlaying(false);
+        resolve();
+      } else {
+        audioElement.play()
+          .then(() => {
+            setIsPlaying(true);
+            resolve();
+          })
+          .catch(error => {
+            console.error('Error playing audio:', error);
+            reject(error);
+          });
+      }
+    });
   };
 
   const nextTrack = () => {
@@ -79,8 +96,8 @@ export const AudioProvider = ({ children }) => {
 
   const handleTrackEnd = () => {
     if (repeatMode === 'one') {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
+      audioElement.currentTime = 0;
+      audioElement.play();
     } else if (repeatMode === 'all' || currentTrack < playlist.length - 1) {
       nextTrack();
     } else {
@@ -97,9 +114,9 @@ export const AudioProvider = ({ children }) => {
         setPlaylist(data.playlist);
         setCurrentTrack(0);
         setIsPlaying(true);
-        if (audioRef.current) {
-          audioRef.current.src = data.playlist[0].url;
-          audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+        if (audioElement) {
+          audioElement.src = data.playlist[0].url;
+          audioElement.play().catch(error => console.error('Error playing audio:', error));
         }
       } else {
         console.error('Invalid or empty playlist data received:', data);
@@ -130,9 +147,9 @@ export const AudioProvider = ({ children }) => {
     setPlaylist([newTrack]);
     setCurrentTrack(0);
     setIsPlaying(true);
-    if (audioRef.current) {
-      audioRef.current.src = newTrack.url;
-      audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+    if (audioElement) {
+      audioElement.src = newTrack.url;
+      audioElement.play().catch(error => console.error('Error playing audio:', error));
     }
   };
 
@@ -149,9 +166,9 @@ export const AudioProvider = ({ children }) => {
     if (!isPlaying) {
       setIsPlaying(true);
       setCurrentTrack(0);
-      if (audioRef.current) {
-        audioRef.current.src = newTrack.url;
-        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+      if (audioElement) {
+        audioElement.src = newTrack.url;
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
       }
     }
   };
@@ -173,9 +190,9 @@ export const AudioProvider = ({ children }) => {
     if (!isPlaying && playlist.length === 0) {
       setIsPlaying(true);
       setCurrentTrack(0);
-      if (audioRef.current) {
-        audioRef.current.src = newTrack.url;
-        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+      if (audioElement) {
+        audioElement.src = newTrack.url;
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
       }
     }
   };
@@ -187,8 +204,8 @@ export const AudioProvider = ({ children }) => {
         setCurrentTrack(currentTrack - 1);
       } else if (index === currentTrack && newPlaylist.length > 0) {
         // If we're removing the current track, play the next one (or the previous if it's the last)
-        audioRef.current.src = newPlaylist[currentTrack % newPlaylist.length].url;
-        audioRef.current.play().catch(error => console.error('Error playing audio:', error));
+        audioElement.src = newPlaylist[currentTrack % newPlaylist.length].url;
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
       } else if (newPlaylist.length === 0) {
         setIsPlaying(false);
         setCurrentTrack(0);
@@ -201,9 +218,9 @@ export const AudioProvider = ({ children }) => {
     setPlaylist([]);
     setCurrentTrack(0);
     setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
     }
   };
 
@@ -212,7 +229,7 @@ export const AudioProvider = ({ children }) => {
       playlist,
       currentTrack,
       isPlaying,
-      audioRef,
+      audioRef: { current: audioElement },
       playPause,
       nextTrack,
       prevTrack,
@@ -230,14 +247,12 @@ export const AudioProvider = ({ children }) => {
       toggleRepeat,
       stopAndClearPlaylist,
       S3_BASE_URL_ALBUMS,
-      setIsPlaying  // Add this line to expose setIsPlaying
+      setIsPlaying,  // Add this line to expose setIsPlaying
+      radioStations,
+      currentRadioStation,
+      setCurrentRadioStation,
     }}>
       {children}
-      <audio 
-        ref={audioRef} 
-        onEnded={handleTrackEnd}
-        onError={(e) => console.error('Audio error:', e)}
-      />
     </AudioContext.Provider>
   );
 };

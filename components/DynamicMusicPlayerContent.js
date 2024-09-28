@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo, FaList } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo, FaList, FaRadio } from 'react-icons/fa';
 import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,13 +20,17 @@ const DynamicMusicPlayerContent = () => {
     toggleRepeat,
     isShuffled,
     repeatMode,
-    S3_BASE_URL_ALBUMS
+    S3_BASE_URL_ALBUMS,
+    radioStations, // Add this line to get radio stations from context
+    currentRadioStation, // Add this line
+    setCurrentRadioStation // Add this line
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
   const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png');
   const [duration, setDuration] = useState(0);
   const [showPlaylist, setShowPlaylist] = useState(false);
+  const [showRadioStations, setShowRadioStations] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -84,6 +88,17 @@ const DynamicMusicPlayerContent = () => {
 
   const togglePlaylist = () => {
     setShowPlaylist(!showPlaylist);
+    if (!showPlaylist) {
+      setShowRadioStations(false);
+    }
+  };
+
+  const toggleRadioStations = () => {
+    console.log('Toggle Radio Stations clicked');
+    setShowRadioStations(!showRadioStations);
+    if (!showRadioStations) {
+      setShowPlaylist(false);
+    }
   };
 
   return (
@@ -104,25 +119,32 @@ const DynamicMusicPlayerContent = () => {
         </div>
       </div>
       
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={toggleShuffle} className={`text-sm ${isShuffled ? 'text-blue-500' : 'text-gray-500'}`}>
-          <FaRandom />
-        </button>
-        <button onClick={prevTrack} className="text-gray-600 dark:text-gray-300">
-          <FaStepBackward />
-        </button>
-        <button onClick={playPause} className="bg-blue-500 text-white rounded-full p-3">
-          {isPlaying ? <FaPause /> : <FaPlay />}
-        </button>
-        <button onClick={nextTrack} className="text-gray-600 dark:text-gray-300">
-          <FaStepForward />
-        </button>
-        <button onClick={toggleRepeat} className={`text-sm ${repeatMode !== 'off' ? 'text-blue-500' : 'text-gray-500'}`}>
-          <FaRedo />
-        </button>
-        <button onClick={togglePlaylist} className={`text-sm ${showPlaylist ? 'text-blue-500' : 'text-gray-500'}`}>
-          <FaList />
-        </button>
+      <div className="flex items-center justify-between mb-4 flex-wrap">
+        <div className="flex items-center space-x-2">
+          <button onClick={toggleShuffle} className={`text-sm ${isShuffled ? 'text-blue-500' : 'text-gray-500'}`}>
+            <FaRandom />
+          </button>
+          <button onClick={prevTrack} className="text-gray-600 dark:text-gray-300">
+            <FaStepBackward />
+          </button>
+          <button onClick={playPause} className="bg-blue-500 text-white rounded-full p-2">
+            {isPlaying ? <FaPause /> : <FaPlay />}
+          </button>
+          <button onClick={nextTrack} className="text-gray-600 dark:text-gray-300">
+            <FaStepForward />
+          </button>
+          <button onClick={toggleRepeat} className={`text-sm ${repeatMode !== 'off' ? 'text-blue-500' : 'text-gray-500'}`}>
+            <FaRedo />
+          </button>
+        </div>
+        <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+          <button onClick={togglePlaylist} className={`text-sm ${showPlaylist ? 'text-blue-500' : 'text-gray-500'}`}>
+            <FaList />
+          </button>
+          <button onClick={toggleRadioStations} className={`text-sm ${showRadioStations ? 'text-blue-500' : 'text-gray-500'}`}>
+            <FaRadio />
+          </button>
+        </div>
       </div>
 
       <div className="mb-4">
@@ -161,6 +183,23 @@ const DynamicMusicPlayerContent = () => {
                 onClick={() => setCurrentTrack(index)}
               >
                 {formatSongTitle(track.title)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {showRadioStations && (
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold mb-2">Radio Stations</h3>
+          <ul className="text-xs text-gray-600 dark:text-gray-400">
+            {radioStations.map((station) => (
+              <li 
+                key={station.id}
+                className={`cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${currentRadioStation === station.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                onClick={() => setCurrentRadioStation(station.id)}
+              >
+                {station.name}
               </li>
             ))}
           </ul>
