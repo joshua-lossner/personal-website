@@ -173,6 +173,7 @@ const DynamicMusicPlayer = () => {
     <div className="flex flex-col items-start w-full p-6">
       <div className="flex items-center mb-4 w-full">
         <div className="relative w-16 h-16 mr-4 flex-shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src={albumArtUrl || `${S3_BASE_URL_ALBUMS}/default-album-art.png`}
             alt="Album Art" 

@@ -1,19 +1,61 @@
-import Head from 'next/head'
-import PostCard from '../components/PostCard'
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import Head from 'next/head';
+import PostCard from '../components/PostCard';
 import { getSortedPostsData } from '../lib/posts';
 
-export default function Home({ initialPosts }) {
+const POSTS_PER_PAGE = 10;
+
+export default function Home({ initialPosts, totalPosts }) {
   const [posts, setPosts] = useState(initialPosts);
+  const [filteredPosts, setFilteredPosts] = useState(initialPosts);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(initialPosts.length < totalPosts);
   const [activeTag, setActiveTag] = useState(null);
+  const observer = useRef();
+
+  const lastPostElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+  useEffect(() => {
+    const fetchMorePosts = async () => {
+      if (page === 1) return; // Don't fetch on initial load
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/posts?page=${page}&limit=${POSTS_PER_PAGE}`);
+        const newPosts = await res.json();
+        setPosts(prevPosts => [...prevPosts, ...newPosts]);
+        setHasMore(newPosts.length === POSTS_PER_PAGE);
+      } catch (error) {
+        console.error('Error fetching more posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMorePosts();
+  }, [page]);
+
+  useEffect(() => {
+    if (activeTag) {
+      setFilteredPosts(posts.filter(post => post.tags && post.tags.includes(activeTag)));
+    } else {
+      setFilteredPosts(posts);
+    }
+  }, [posts, activeTag]);
 
   const handleTagClick = (tag) => {
     if (activeTag === tag) {
-      setPosts(initialPosts);
       setActiveTag(null);
     } else {
-      const filteredPosts = initialPosts.filter(post => post.tags && post.tags.includes(tag));
-      setPosts(filteredPosts);
       setActiveTag(tag);
     }
   };
@@ -38,43 +80,39 @@ export default function Home({ initialPosts }) {
           </div>
         )}
       </div>
+
       <div className="flex-grow overflow-y-auto">
         <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
-          {posts && posts.length > 0 ? (
-            posts
-              .sort((a, b) => {
-                if (a.pinned && !b.pinned) return -1;
-                if (!a.pinned && b.pinned) return 1;
-                return new Date(b.datePublished) - new Date(a.datePublished);
-              })
-              .map((post) => (
-                <PostCard 
-                  key={post.id} 
-                  title={post.title}
-                  subtitle={post.subtitle}
-                  datePublished={post.datePublished}
-                  category={post.category} 
-                  description={post.description} 
-                  content={post.content}
-                  tags={post.tags}
-                  onTagClick={handleTagClick}
-                  audioFile={post.audioFile}
-                />
-              ))
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">No posts available.</p>
-          )}
+          {filteredPosts.map((post, index) => (
+            <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
+              <PostCard 
+                title={post.title}
+                subtitle={post.subtitle}
+                datePublished={post.datePublished}
+                category={post.category} 
+                description={post.description} 
+                content={post.content}
+                tags={post.tags}
+                audioFile={post.audioFile}
+                onTagClick={handleTagClick}
+              />
+            </div>
+          ))}
+          {loading && <p className="text-center">Loading more posts...</p>}
+          {!hasMore && !activeTag && <p className="text-center">No more posts to load</p>}
+          {filteredPosts.length === 0 && <p className="text-center">No posts found for this tag</p>}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export async function getStaticProps() {
-  const { posts } = await getSortedPostsData();
+export async function getServerSideProps() {
+  const { posts, totalPosts } = await getSortedPostsData(null, 1, POSTS_PER_PAGE);
   return {
     props: {
       initialPosts: posts,
+      totalPosts,
     },
   };
 }

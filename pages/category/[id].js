@@ -67,15 +67,15 @@ export default function Category({ initialCategory, initialPosts = [] }) {
               .map((post) => (
                 <PostCard 
                   key={post.id} 
-                  title={post.title}
-                  subtitle={post.subtitle}
-                  datePublished={post.datePublished}
-                  category={post.category} 
-                  description={post.description} 
-                  content={post.content}
-                  tags={post.tags}
+                  title={post.title || 'Untitled'}
+                  subtitle={post.subtitle || ''}
+                  datePublished={post.datePublished || ''}
+                  category={post.category || ''} 
+                  description={post.description || ''} 
+                  content={post.content || ''}
+                  tags={post.tags || []}
                   onTagClick={handleTagClick}
-                  audioFile={post.audioFile}
+                  audioFile={post.audioFile || ''}
                 />
               ))
           ) : (
