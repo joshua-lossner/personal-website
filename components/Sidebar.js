@@ -11,7 +11,7 @@ export default function Sidebar({ categories = [] }) {
   }
 
   return (
-    <nav className="bg-gray-200 dark:bg-gray-800 md:w-20 md:h-full md:flex-shrink-0 fixed md:static top-0 left-0 right-0 z-50">
+    <nav className="bg-gray-200 dark:bg-gray-800 md:w-20 md:h-full md:flex-shrink-0 fixed md:static top-0 left-0 right-0 z-40">
       <ul className="flex md:flex-col items-center justify-around md:justify-start md:space-y-8 p-4 md:pt-8">
         <li onMouseEnter={() => prefetchCategory('home')}>
           <Link href="/">

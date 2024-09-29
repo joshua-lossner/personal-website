@@ -21,7 +21,7 @@ const Layout = ({ children, categories }) => {
       <div className="flex-grow overflow-auto pt-16 md:pt-0">
         {children}
       </div>
-      <div className={`fixed md:static right-0 top-0 h-full transition-transform duration-300 ease-in-out ${isMusicPlayerVisible ? 'translate-x-0' : 'translate-x-full md:translate-x-0'} bg-white dark:bg-gray-800`}>
+      <div className={`fixed md:static right-0 top-0 h-full z-50 transition-transform duration-300 ease-in-out ${isMusicPlayerVisible ? 'translate-x-0' : 'translate-x-full md:translate-x-0'} bg-white dark:bg-gray-800`}>
         <ErrorBoundary>
           <DynamicMusicPlayer />
         </ErrorBoundary>
