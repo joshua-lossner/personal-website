@@ -103,7 +103,7 @@ const DynamicMusicPlayer = () => {
   }, [S3_BASE_URL_ALBUMS]);
 
   const formatSongTitle = (title) => {
-    return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
+    return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Choose Vibe Below';
   };
 
   const getCurrentLyrics = () => {
@@ -182,7 +182,7 @@ const DynamicMusicPlayer = () => {
         </div>
         <div className="flex-grow">
           <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-            {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Set the mood above'}
+            {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Choose Vibe Below'}
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-400">AI Generated Music</p>
         </div>

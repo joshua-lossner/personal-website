@@ -85,7 +85,7 @@ const DynamicMusicPlayerContent = () => {
   }, [audioRef, repeatMode, isShuffled, currentTrack, playlist.length, nextTrack, setCurrentTrack]);
 
   const formatSongTitle = (title) => {
-    return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
+    return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Choose Vibe Below';
   };
 
   const getCurrentLyrics = () => {
@@ -141,7 +141,7 @@ const DynamicMusicPlayerContent = () => {
         />
         <div>
           <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-            {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'No track selected'}
+            {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Choose Vibe Below'}
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-400">AI Generated Music</p>
         </div>
