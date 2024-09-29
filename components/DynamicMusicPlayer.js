@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaWaveSquare, FaRandom, FaRedo, FaVolumeMute, FaList, FaBroadcastTower } from 'react-icons/fa';
-import { GiGrandPiano, GiSaxophone } from 'react-icons/gi';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo, FaList, FaBroadcastTower } from 'react-icons/fa';
 import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -15,28 +14,30 @@ const DynamicMusicPlayer = () => {
     playPause, 
     nextTrack, 
     prevTrack, 
-    loadPlaylist, 
     setCurrentTrack,
     audioRef,
     toggleShuffle,
     toggleRepeat,
     isShuffled,
     repeatMode,
-    stopAndClearPlaylist,
     S3_BASE_URL_ALBUMS,
     radioStations,
     currentRadioStation,
-    setCurrentRadioStation
+    loadRadioStation
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
-  const [activeGenre, setActiveGenre] = useState(null);
   const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png');
   const [duration, setDuration] = useState(0);
   const [musicPosts, setMusicPosts] = useState([]);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const [showRadioStations, setShowRadioStations] = useState(false);
+  const [showRadioStations, setShowRadioStations] = useState(true); // Set to true initially
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // This effect will run when the component mounts
+    setShowRadioStations(true);
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -77,24 +78,6 @@ const DynamicMusicPlayer = () => {
       setAlbumArt(`${S3_BASE_URL_ALBUMS}/default-album-art.png`);
     }
   }, [currentTrack, playlist, S3_BASE_URL_ALBUMS]);
-
-  const genreButtons = [
-    { genre: 'alternative', icon: <FaWaveSquare size={20} /> },
-    { genre: 'hardrock', icon: <GiGrandPiano size={20} /> },
-    { genre: 'classical', icon: <GiSaxophone size={20} /> },
-    { genre: 'jazz', icon: <FaVolumeMute size={20} /> },
-  ];
-
-  const handleGenreClick = async (genre) => {
-    console.log('Genre clicked:', genre);
-    if (genre !== 'none') {
-      await loadPlaylist(genre);
-      setActiveGenre(genre);
-    } else {
-      stopAndClearPlaylist();
-      setActiveGenre(null);
-    }
-  };
 
   const formatSongTitle = (title) => {
     return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
@@ -143,16 +126,12 @@ const DynamicMusicPlayer = () => {
 
   const togglePlaylist = () => {
     setShowPlaylist(!showPlaylist);
-    if (!showPlaylist) {
-      setShowRadioStations(false);
-    }
+    setShowRadioStations(false);
   };
 
   const toggleRadioStations = () => {
     setShowRadioStations(!showRadioStations);
-    if (!showRadioStations) {
-      setShowPlaylist(false);
-    }
+    setShowPlaylist(false);
   };
 
   const handlePlayPause = () => {
@@ -163,22 +142,12 @@ const DynamicMusicPlayer = () => {
     });
   };
 
+  const handleRadioStationClick = (stationId) => {
+    loadRadioStation(stationId);
+  };
+
   return (
     <div className="flex flex-col items-start w-full p-6">
-      <div className="flex justify-center space-x-4 mb-6">
-        {genreButtons.map(({ genre, icon }) => (
-          <button 
-            key={genre} 
-            className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors
-              ${activeGenre === genre ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'}
-              hover:bg-blue-600 hover:text-white`}
-            onClick={() => handleGenreClick(genre)}
-          >
-            {icon}
-          </button>
-        ))}
-      </div>
-      
       <div className="flex items-center mb-4 w-full">
         <img 
           src={albumArt} 
@@ -252,7 +221,7 @@ const DynamicMusicPlayer = () => {
       
       {showPlaylist && playlist.length > 0 && (
         <div className="mt-4 w-full">
-          <h3 className="text-sm font-semibold mb-2">Playlist</h3>
+          <h3 className="text-sm font-semibold mb-2">Now Playing</h3>
           <ul className="text-xs text-gray-600 dark:text-gray-400">
             {playlist.map((track, index) => (
               <li 
@@ -275,7 +244,7 @@ const DynamicMusicPlayer = () => {
               <li 
                 key={station.id}
                 className={`cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${currentRadioStation === station.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                onClick={() => setCurrentRadioStation(station.id)}
+                onClick={() => handleRadioStationClick(station.id)}
               >
                 {station.name}
               </li>

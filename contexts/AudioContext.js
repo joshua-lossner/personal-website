@@ -12,11 +12,11 @@ export const AudioProvider = ({ children }) => {
   const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState('');
   const [audioElement, setAudioElement] = useState(null);
   const [radioStations, setRadioStations] = useState([
-    { id: 1, name: "Jazz FM", url: "http://example.com/jazz-fm-stream" },
-    { id: 2, name: "Classical Vibes", url: "http://example.com/classical-vibes-stream" },
-    { id: 3, name: "Rock Radio", url: "http://example.com/rock-radio-stream" },
-    { id: 4, name: "Chill Lounge", url: "http://example.com/chill-lounge-stream" },
-    { id: 5, name: "Electronic Beats", url: "http://example.com/electronic-beats-stream" },
+    { id: 1, name: "Alternative Radio", tag: "alternative" },
+    { id: 2, name: "Jazz FM", tag: "jazz" },
+    { id: 3, name: "Classical Vibes", tag: "classical" },
+    { id: 4, name: "Rock Radio", tag: "rock" },
+    { id: 5, name: "Chill Lounge", tag: "chill" },
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
 
@@ -224,6 +224,35 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const loadRadioStation = async (stationId) => {
+    const station = radioStations.find(s => s.id === stationId);
+    if (station) {
+      try {
+        const response = await fetch(`/api/music-by-tag?tag=${station.tag}`);
+        const data = await response.json();
+        if (Array.isArray(data.playlist) && data.playlist.length > 0) {
+          console.log('Loaded radio station playlist:', data.playlist);
+          setPlaylist(data.playlist);
+          setCurrentTrack(0);
+          setIsPlaying(true);
+          setCurrentRadioStation(stationId);
+          if (audioElement) {
+            audioElement.src = data.playlist[0].url;
+            audioElement.play().catch(error => console.error('Error playing audio:', error));
+          }
+        } else {
+          console.error('Invalid or empty playlist data received:', data);
+          setPlaylist([]);
+          setIsPlaying(false);
+        }
+      } catch (error) {
+        console.error('Error loading radio station:', error);
+        setPlaylist([]);
+        setIsPlaying(false);
+      }
+    }
+  };
+
   return (
     <AudioContext.Provider value={{
       playlist,
@@ -251,6 +280,7 @@ export const AudioProvider = ({ children }) => {
       radioStations,
       currentRadioStation,
       setCurrentRadioStation,
+      loadRadioStation,
     }}>
       {children}
     </AudioContext.Provider>
