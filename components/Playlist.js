@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { AudioContext } from '../contexts/AudioContext';
 
 const Playlist = () => {
-  const { playlist, setCurrentTrack, currentTrack } = useContext(AudioContext);
+  const { playlist, currentTrack, playTrack } = useContext(AudioContext);
 
   return (
     <div className="w-full bg-gray-200 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-y-auto max-h-60">
@@ -13,7 +13,7 @@ const Playlist = () => {
             <li 
               key={track.id || index} 
               className={`cursor-pointer mb-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white ${index === currentTrack ? 'font-bold' : ''}`}
-              onClick={() => setCurrentTrack(index)}
+              onClick={() => playTrack(index)}
               aria-label={`Play ${track.title}`}
             >
               {track.title}

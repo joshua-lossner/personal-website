@@ -51,12 +51,17 @@ export const AudioProvider = ({ children }) => {
 
   useEffect(() => {
     if (playlist.length > 0 && audioElement) {
-      audioElement.src = playlist[currentTrack].url;
-      if (isPlaying) {
-        audioElement.play().catch(error => console.error('Error playing audio:', error));
+      const currentSong = playlist[currentTrack];
+      if (audioElement.src !== currentSong.url) {
+        const wasPlaying = !audioElement.paused;
+        audioElement.src = currentSong.url;
+        audioElement.currentTime = 0; // Reset time only when changing tracks
+        if (wasPlaying) {
+          audioElement.play().catch(error => console.error('Error playing audio:', error));
+        }
       }
     }
-  }, [currentTrack, isPlaying, playlist]);
+  }, [currentTrack]); // Only depend on currentTrack, not playlist
 
   useEffect(() => {
     if (audioElement) {
@@ -98,13 +103,20 @@ export const AudioProvider = ({ children }) => {
 
   const nextTrack = () => {
     console.log('Next track called');
-    if (isShuffled) {
-      const nextIndex = Math.floor(Math.random() * playlist.length);
+    if (playlist.length > 0) {
+      let nextIndex;
+      if (isShuffled) {
+        nextIndex = Math.floor(Math.random() * playlist.length);
+      } else {
+        nextIndex = (currentTrack + 1) % playlist.length;
+      }
       setCurrentTrack(nextIndex);
-    } else {
-      setCurrentTrack((prev) => (prev + 1) % playlist.length);
+      setIsPlaying(true);
+      if (audioElement) {
+        audioElement.src = playlist[nextIndex].url;
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
+      }
     }
-    setIsPlaying(true);
   };
 
   const prevTrack = () => {
@@ -126,17 +138,6 @@ export const AudioProvider = ({ children }) => {
       if (current === 'one') return 'all';
       return 'off';
     });
-  };
-
-  const handleTrackEnd = () => {
-    if (repeatMode === 'one') {
-      audioElement.currentTime = 0;
-      audioElement.play();
-    } else if (repeatMode === 'all' || currentTrack < playlist.length - 1) {
-      nextTrack();
-    } else {
-      setIsPlaying(false);
-    }
   };
 
   const loadPlaylist = async (genre) => {
@@ -193,13 +194,14 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const audioUrl = constructAudioUrl(audioFile); // Construct and escape URL
-    console.log('Constructed audio URL:', audioUrl); // Log the constructed URL
-    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl }; // Decode title for display
+    const audioUrl = constructAudioUrl(audioFile);
+    console.log('Constructed audio URL:', audioUrl);
+    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl };
     setPlaylist(prev => [...prev, newTrack]);
-    if (!isPlaying) {
-      setIsPlaying(true);
+    // Start playing only if the playlist was previously empty
+    if (playlist.length === 0) {
       setCurrentTrack(0);
+      setIsPlaying(true);
       if (audioElement) {
         audioElement.src = newTrack.url;
         audioElement.play().catch(error => console.error('Error playing audio:', error));
@@ -213,17 +215,20 @@ export const AudioProvider = ({ children }) => {
       console.error('No audio file provided');
       return;
     }
-    const audioUrl = constructAudioUrl(audioFile); // Construct and escape URL
-    console.log('Constructed audio URL:', audioUrl); // Log the constructed URL
-    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl }; // Decode title for display
+    const audioUrl = constructAudioUrl(audioFile);
+    console.log('Constructed audio URL:', audioUrl);
+    const newTrack = { title: decodeURIComponent(audioFile.split('/').pop()), url: audioUrl };
+  
     setPlaylist(prev => [
       ...prev.slice(0, currentTrack + 1),
       newTrack,
       ...prev.slice(currentTrack + 1)
     ]);
-    if (!isPlaying && playlist.length === 0) {
-      setIsPlaying(true);
+
+    // Only start playing if the playlist was previously empty
+    if (playlist.length === 0) {
       setCurrentTrack(0);
+      setIsPlaying(true);
       if (audioElement) {
         audioElement.src = newTrack.url;
         audioElement.play().catch(error => console.error('Error playing audio:', error));
@@ -287,6 +292,18 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const playTrack = (index) => {
+    if (index >= 0 && index < playlist.length) {
+      setCurrentTrack(index);
+      setIsPlaying(true);
+      if (audioElement) {
+        audioElement.src = playlist[index].url;
+        audioElement.currentTime = 0; // Reset the current time to 0
+        audioElement.play().catch(error => console.error('Error playing audio:', error));
+      }
+    }
+  };
+
   return (
     <AudioContext.Provider value={{
       playlist,
@@ -316,6 +333,7 @@ export const AudioProvider = ({ children }) => {
       setCurrentRadioStation,
       loadRadioStation,
       currentArtwork,
+      playTrack,
     }}>
       {children}
     </AudioContext.Provider>
