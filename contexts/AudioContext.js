@@ -12,11 +12,12 @@ export const AudioProvider = ({ children }) => {
   const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState(process.env.NEXT_PUBLIC_S3_BASE_URL_ALBUMS || '');
   const [audioElement, setAudioElement] = useState(null);
   const [radioStations, setRadioStations] = useState([
-    { id: 1, name: "Alternative Radio", tag: "alternative" },
-    { id: 2, name: "Jazz FM", tag: "jazz" },
-    { id: 3, name: "Classical Vibes", tag: "classical" },
-    { id: 4, name: "Rock Radio", tag: "rock" },
-    { id: 5, name: "Chill Lounge", tag: "chill" },
+    { id: 1, name: "Electric Daydreams", tag: "electric-chill" },
+    { id: 2, name: "Ivory Reverie", tag: "classic-piano" },
+    { id: 3, name: "Velvet Vibes", tag: "soft-jazz" },
+    { id: 4, name: "Mindwarp Radio", tag: "prog-rock" },
+    { id: 5, name: "AltSoundwave", tag: "alternative" },
+    { id: 6, name: "Deep Dives On Air", tag: "podcast-show" },
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
   const [currentArtwork, setCurrentArtwork] = useState(null);
