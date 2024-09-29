@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { AudioContext } from '../contexts/AudioContext';
-import remarkBreaks from 'remark-breaks'; // Ensure this import is correct
+import remarkBreaks from 'remark-breaks';
 import { Menu, Transition } from '@headlessui/react';
 
 const PostCard = ({ title, subtitle, datePublished, category, description, content, tags, onTagClick, audioFile }) => {
@@ -114,12 +114,22 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
       </div>
 
       {isExpanded && hasAdditionalContent && (
-        <div className="mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-inner transition-all duration-300 ease-in-out">
-          <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400"> {/* Apply prose-sm class for smaller text */}
+        <div className="mt-4 transition-all duration-300 ease-in-out">
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             <ReactMarkdown 
-              className="prose dark:prose-invert max-w-none" // Apply prose class here
-              remarkPlugins={[remarkGfm, remarkBreaks]} // Updated here
+              className="prose dark:prose-invert max-w-none"
+              remarkPlugins={[remarkGfm, remarkBreaks]}
               rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({node, ...props}) => <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 mb-2" {...props} />,
+                p: ({node, ...props}) => <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3" {...props} />,
+                li: ({node, ...props}) => <li className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1" {...props} />,
+                a: ({node, ...props}) => <a className="text-blue-500 hover:text-blue-600 transition-colors duration-200" {...props} />,
+              }}
             >
               {content}
             </ReactMarkdown>
