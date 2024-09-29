@@ -31,13 +31,19 @@ const DynamicMusicPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [musicPosts, setMusicPosts] = useState([]);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const [showRadioStations, setShowRadioStations] = useState(true); // Set to true initially
+  const [showRadioStations, setShowRadioStations] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // This effect will run when the component mounts
     setShowRadioStations(true);
   }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      setShowPlaylist(true);
+      setShowRadioStations(false);
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     if (audioRef.current) {
