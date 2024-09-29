@@ -8,7 +8,7 @@ export const AudioProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [isShuffled, setIsShuffled] = useState(false);
-  const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'all', 'one'
+  const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'one', 'all'
   const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState(process.env.NEXT_PUBLIC_S3_BASE_URL_ALBUMS || '');
   const [audioElement, setAudioElement] = useState(null);
   const [radioStations, setRadioStations] = useState([
@@ -30,13 +30,32 @@ export const AudioProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (audioElement) {
+      const handleTrackEnd = () => {
+        console.log('Track ended');
+        if (repeatMode === 'one') {
+          audioElement.currentTime = 0;
+          audioElement.play();
+        } else if (repeatMode === 'all' || currentTrack < playlist.length - 1) {
+          nextTrack();
+        } else {
+          setIsPlaying(false);
+        }
+      };
+
+      audioElement.addEventListener('ended', handleTrackEnd);
+      return () => audioElement.removeEventListener('ended', handleTrackEnd);
+    }
+  }, [audioElement, repeatMode, currentTrack, playlist.length]);
+
+  useEffect(() => {
     if (playlist.length > 0 && audioElement) {
       audioElement.src = playlist[currentTrack].url;
       if (isPlaying) {
         audioElement.play().catch(error => console.error('Error playing audio:', error));
       }
     }
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack, isPlaying, playlist]);
 
   useEffect(() => {
     if (audioElement) {
@@ -77,12 +96,14 @@ export const AudioProvider = ({ children }) => {
   };
 
   const nextTrack = () => {
+    console.log('Next track called');
     if (isShuffled) {
       const nextIndex = Math.floor(Math.random() * playlist.length);
       setCurrentTrack(nextIndex);
     } else {
       setCurrentTrack((prev) => (prev + 1) % playlist.length);
     }
+    setIsPlaying(true);
   };
 
   const prevTrack = () => {
@@ -100,12 +121,9 @@ export const AudioProvider = ({ children }) => {
 
   const toggleRepeat = () => {
     setRepeatMode(current => {
-      switch (current) {
-        case 'off': return 'all';
-        case 'all': return 'one';
-        case 'one': return 'off';
-        default: return 'off';
-      }
+      if (current === 'off') return 'one';
+      if (current === 'one') return 'all';
+      return 'off';
     });
   };
 

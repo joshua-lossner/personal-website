@@ -11,19 +11,21 @@ const DynamicMusicPlayerContent = () => {
   const { 
     playlist, 
     currentTrack, 
-    isPlaying, 
+    isPlaying,
     playPause, 
     nextTrack, 
     prevTrack, 
+    setCurrentTrack,
     audioRef,
     toggleShuffle,
     toggleRepeat,
     isShuffled,
     repeatMode,
     S3_BASE_URL_ALBUMS,
-    radioStations, // Add this line to get radio stations from context
-    currentRadioStation, // Add this line
-    setCurrentRadioStation // Add this line
+    radioStations,
+    currentRadioStation,
+    setCurrentRadioStation
+    // Remove loadRadioStation and currentArtwork from here
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
@@ -62,6 +64,26 @@ const DynamicMusicPlayerContent = () => {
     }
   }, [currentTrack, playlist, S3_BASE_URL_ALBUMS]);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      const audio = audioRef.current;
+      const handleEnded = () => {
+        if (repeatMode === 'one') {
+          audio.currentTime = 0;
+          audio.play();
+        } else if (repeatMode === 'all' || (!isShuffled && currentTrack < playlist.length - 1)) {
+          nextTrack();
+        } else if (isShuffled) {
+          const nextIndex = Math.floor(Math.random() * playlist.length);
+          setCurrentTrack(nextIndex);
+        }
+      };
+      
+      audio.addEventListener('ended', handleEnded);
+      return () => audio.removeEventListener('ended', handleEnded);
+    }
+  }, [audioRef, repeatMode, isShuffled, currentTrack, playlist.length, nextTrack, setCurrentTrack]);
+
   const formatSongTitle = (title) => {
     return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
   };
@@ -99,6 +121,12 @@ const DynamicMusicPlayerContent = () => {
     if (!showRadioStations) {
       setShowPlaylist(false);
     }
+  };
+
+  const handleRadioStationClick = (stationId) => {
+    setCurrentRadioStation(stationId);
+    // If you need to load the radio station, you can add the logic here
+    // or call a function from the AudioContext that handles this
   };
 
   return (
@@ -197,7 +225,7 @@ const DynamicMusicPlayerContent = () => {
               <li 
                 key={station.id}
                 className={`cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${currentRadioStation === station.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                onClick={() => setCurrentRadioStation(station.id)}
+                onClick={() => handleRadioStationClick(station.id)}
               >
                 {station.name}
               </li>

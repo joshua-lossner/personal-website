@@ -121,14 +121,14 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
               remarkPlugins={[remarkGfm, remarkBreaks]}
               rehypePlugins={[rehypeRaw]}
               components={{
-                h1: ({node, ...props}) => <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
-                h2: ({node, ...props}) => <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 mb-2" {...props} />,
-                p: ({node, ...props}) => <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3" {...props} />,
-                ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3" {...props} />,
-                li: ({node, ...props}) => <li className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1" {...props} />,
-                a: ({node, ...props}) => <a className="text-blue-500 hover:text-blue-600 transition-colors duration-200" {...props} />,
+                h1: ({...props}) => <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
+                h2: ({...props}) => <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2" {...props} />,
+                h3: ({...props}) => <h3 className="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 mb-2" {...props} />,
+                p: ({...props}) => <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3" {...props} />,
+                ul: ({...props}) => <ul className="list-disc list-inside mb-3" {...props} />,
+                ol: ({...props}) => <ol className="list-decimal list-inside mb-3" {...props} />,
+                li: ({...props}) => <li className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1" {...props} />,
+                a: ({...props}) => <a className="text-blue-500 hover:text-blue-600 transition-colors duration-200" {...props} />,
               }}
             >
               {content}
