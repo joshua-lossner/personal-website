@@ -11,6 +11,7 @@
     "fetch-documents": "node scripts/fetchDocuments.js"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.8",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "gray-matter": "^4.0.3",
@@ -21,10 +22,10 @@
     "react-icons": "^5.3.0",
     "react-markdown": "^9.0.1",
     "rehype-raw": "^6.1.1",
+    "remark-breaks": "^2.0.0",
     "remark-gfm": "^4.0.0",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
-    "remark-breaks": "^2.0.0"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
