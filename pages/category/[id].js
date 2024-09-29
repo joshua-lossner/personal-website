@@ -93,6 +93,7 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
           </div>
         )}
       </div>
+
       <div className="flex-grow overflow-y-auto">
         <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
           {posts && posts.length > 0 ? (
@@ -125,7 +126,7 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export async function getStaticPaths() {
@@ -142,7 +143,6 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const category = params.id === 'home' ? null : params.id;
   const { posts, totalPosts } = await getSortedPostsData(category, 1, POSTS_PER_PAGE);
-  console.log('Fetched posts:', posts.map(p => ({ title: p.title, contentLength: p.content?.length || 0 })));
 
   return {
     props: {
