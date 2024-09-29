@@ -4,13 +4,14 @@ export default async function handler(req, res) {
   try {
     const db = await openDb();
     const posts = await db.all(
-      `SELECT title, audioFile FROM posts 
+      `SELECT title, audioFile, artwork FROM posts 
        WHERE category = 'music' AND audioFile IS NOT NULL`
     );
 
     const playlist = posts.map(post => ({
       title: post.title,
-      url: constructAudioUrl(post.audioFile)
+      url: constructAudioUrl(post.audioFile),
+      artwork: post.artwork // Include artwork in the response
     }));
 
     res.status(200).json({ playlist });

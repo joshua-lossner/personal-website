@@ -4,6 +4,9 @@ const nextConfig = {
   env: {
     S3_BASE_URL: process.env.S3_BASE_URL,
   },
+  publicRuntimeConfig: {
+    S3_BASE_URL_ALBUMS: process.env.NEXT_PUBLIC_S3_BASE_URL_ALBUMS,
+  },
 };
 
 export default nextConfig;

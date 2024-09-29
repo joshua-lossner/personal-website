@@ -23,16 +23,17 @@ const DynamicMusicPlayer = () => {
     S3_BASE_URL_ALBUMS,
     radioStations,
     currentRadioStation,
-    loadRadioStation
+    loadRadioStation,
+    currentArtwork
   } = useContext(AudioContext);
 
   const [progress, setProgress] = useState(0);
-  const [albumArt, setAlbumArt] = useState('/album-art/default-album-art.png');
   const [duration, setDuration] = useState(0);
   const [musicPosts, setMusicPosts] = useState([]);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [showRadioStations, setShowRadioStations] = useState(true);
   const [error, setError] = useState(null);
+  const [albumArtUrl, setAlbumArtUrl] = useState(null);
 
   useEffect(() => {
     setShowRadioStations(true);
@@ -67,23 +68,39 @@ const DynamicMusicPlayer = () => {
   }, [audioRef]);
 
   useEffect(() => {
-    if (playlist.length > 0) {
+    if (playlist.length > 0 && currentTrack >= 0 && currentTrack < playlist.length) {
       const currentSong = playlist[currentTrack];
-      const artFileName = encodeURIComponent(currentSong.title.replace('.mp3', '').trim()) + '.png';
-      const artPath = `${S3_BASE_URL_ALBUMS}/${artFileName}`;
-      setAlbumArt(artPath);
-      console.log('Album art URL:', artPath);
+      console.log('Current song:', currentSong);
+      const artFileName = encodeURIComponent(currentSong.title.replace(/\.(mp3|wav|ogg)$/, '').trim()) + '.png';
+      console.log('Art file name:', artFileName);
+      const artPath = S3_BASE_URL_ALBUMS ? `${S3_BASE_URL_ALBUMS}/${artFileName}` : `/album-art/${artFileName}`;
+      console.log('Full art path:', artPath);
+      setAlbumArtUrl(artPath);
       
       const img = new Image();
       img.onerror = () => {
         console.error('Failed to load album art:', artPath);
-        setAlbumArt(`${S3_BASE_URL_ALBUMS}/default-album-art.png`);
+        setAlbumArtUrl(S3_BASE_URL_ALBUMS ? `${S3_BASE_URL_ALBUMS}/default-album-art.png` : '/album-art/default-album-art.png');
       };
       img.src = artPath;
-    } else {
-      setAlbumArt(`${S3_BASE_URL_ALBUMS}/default-album-art.png`);
     }
   }, [currentTrack, playlist, S3_BASE_URL_ALBUMS]);
+
+  useEffect(() => {
+    if (currentArtwork) {
+      console.log('Album art URL:', currentArtwork);
+      
+      const img = new Image();
+      img.onerror = () => {
+        console.error('Failed to load album art:', currentArtwork);
+      };
+      img.src = currentArtwork;
+    }
+  }, [currentArtwork]);
+
+  useEffect(() => {
+    console.log('S3_BASE_URL_ALBUMS:', S3_BASE_URL_ALBUMS);
+  }, [S3_BASE_URL_ALBUMS]);
 
   const formatSongTitle = (title) => {
     return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Set the mood above';
@@ -155,13 +172,13 @@ const DynamicMusicPlayer = () => {
   return (
     <div className="flex flex-col items-start w-full p-6">
       <div className="flex items-center mb-4 w-full">
-        <img 
-          src={albumArt} 
-          alt="Album Art" 
-          width={64} 
-          height={64} 
-          className="bg-gray-300 dark:bg-gray-600 rounded-lg mr-4 flex-shrink-0" 
-        />
+        <div className="relative w-16 h-16 mr-4 flex-shrink-0">
+          <img 
+            src={albumArtUrl || `${S3_BASE_URL_ALBUMS}/default-album-art.png`}
+            alt="Album Art" 
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </div>
         <div className="flex-grow">
           <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
             {playlist.length > 0 ? formatSongTitle(playlist[currentTrack].title) : 'Set the mood above'}

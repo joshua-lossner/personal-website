@@ -9,7 +9,7 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [isShuffled, setIsShuffled] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'all', 'one'
-  const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState('');
+  const [S3_BASE_URL_ALBUMS, setS3BaseUrlAlbums] = useState(process.env.NEXT_PUBLIC_S3_BASE_URL_ALBUMS || '');
   const [audioElement, setAudioElement] = useState(null);
   const [radioStations, setRadioStations] = useState([
     { id: 1, name: "Alternative Radio", tag: "alternative" },
@@ -19,6 +19,9 @@ export const AudioProvider = ({ children }) => {
     { id: 5, name: "Chill Lounge", tag: "chill" },
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
+  const [currentArtwork, setCurrentArtwork] = useState(null);
+
+  console.log('S3_BASE_URL_ALBUMS in AudioContext:', process.env.S3_BASE_URL_ALBUMS);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -40,6 +43,18 @@ export const AudioProvider = ({ children }) => {
       audioElement.volume = volume;
     }
   }, [volume]);
+
+  useEffect(() => {
+    if (playlist.length > 0 && currentTrack >= 0 && currentTrack < playlist.length) {
+      const currentSong = playlist[currentTrack];
+      if (currentSong.artwork) {
+        const artworkUrl = `${S3_BASE_URL_ALBUMS}/${currentSong.artwork}`;
+        setCurrentArtwork(artworkUrl);
+      } else {
+        setCurrentArtwork(null);
+      }
+    }
+  }, [currentTrack, playlist, S3_BASE_URL_ALBUMS]);
 
   const playPause = () => {
     return new Promise((resolve, reject) => {
@@ -281,6 +296,7 @@ export const AudioProvider = ({ children }) => {
       currentRadioStation,
       setCurrentRadioStation,
       loadRadioStation,
+      currentArtwork,
     }}>
       {children}
     </AudioContext.Provider>
