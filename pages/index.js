@@ -1,18 +1,26 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Head from 'next/head';
-import PostCard from '../components/PostCard';
 import { getSortedPostsData } from '../lib/posts';
+import PostCard from '../components/PostCard';
 
 const POSTS_PER_PAGE = 10;
 
 export default function Home({ initialPosts, totalPosts }) {
   const [posts, setPosts] = useState(initialPosts);
-  const [filteredPosts, setFilteredPosts] = useState(initialPosts);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPosts.length < totalPosts);
-  const [activeTag, setActiveTag] = useState(null);
   const observer = useRef();
+
+  const filterPostsForHomePage = useCallback((postsToFilter) => {
+    return postsToFilter.filter(post => 
+      !(post.pinned && post.category.toLowerCase() !== 'home')
+    );
+  }, []);
+
+  useEffect(() => {
+    setFilteredPosts(filterPostsForHomePage(posts));
+  }, [posts, filterPostsForHomePage]);
 
   const lastPostElementRef = useCallback(node => {
     if (loading) return;
@@ -44,75 +52,37 @@ export default function Home({ initialPosts, totalPosts }) {
     fetchMorePosts();
   }, [page]);
 
-  useEffect(() => {
-    if (activeTag) {
-      setFilteredPosts(posts.filter(post => post.tags && post.tags.includes(activeTag)));
-    } else {
-      setFilteredPosts(posts);
-    }
-  }, [posts, activeTag]);
-
-  const handleTagClick = (tag) => {
-    if (activeTag === tag) {
-      setActiveTag(null);
-    } else {
-      setActiveTag(tag);
-    }
-  };
-
   return (
-    <div className="flex flex-col h-full">
-      <Head>
-        <title>Joshua C. Lossner - Personal Website</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
-        {activeTag && (
-          <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-            <span className="text-sm md:text-base">Showing posts tagged with: {activeTag}</span>
-            <button 
-              onClick={() => handleTagClick(activeTag)} 
-              className="ml-2 text-sm md:text-base text-blue-600 dark:text-blue-300 hover:underline"
-            >
-              Clear filter
-            </button>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-bold mb-8">Welcome to My Blog</h1>
+      <div className="space-y-8"> {/* Changed to a vertical layout with space between cards */}
+        {filteredPosts.map((post, index) => (
+          <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
+            <PostCard 
+              title={post.title}
+              subtitle={post.subtitle}
+              datePublished={post.datePublished}
+              category={post.category}
+              description={post.description}
+              content={post.content || ''} // Ensure content is always a string
+              tags={post.tags}
+              audioFile={post.audioFile}
+            />
           </div>
-        )}
+        ))}
       </div>
-
-      <div className="flex-grow overflow-y-auto">
-        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
-          {filteredPosts.map((post, index) => (
-            <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
-              <PostCard 
-                title={post.title}
-                subtitle={post.subtitle}
-                datePublished={post.datePublished}
-                category={post.category} 
-                description={post.description} 
-                content={post.content}
-                tags={post.tags}
-                audioFile={post.audioFile}
-                onTagClick={handleTagClick}
-              />
-            </div>
-          ))}
-          {loading && <p className="text-center">Loading more posts...</p>}
-          {!hasMore && !activeTag && <p className="text-center">No more posts to load</p>}
-          {filteredPosts.length === 0 && <p className="text-center">No posts found for this tag</p>}
-        </div>
-      </div>
+      {loading && <p className="text-center mt-4">Loading more posts...</p>}
     </div>
   );
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const { posts, totalPosts } = await getSortedPostsData(null, 1, POSTS_PER_PAGE);
   return {
     props: {
       initialPosts: posts,
       totalPosts,
     },
+    revalidate: 60, // Revalidate every 60 seconds
   };
 }

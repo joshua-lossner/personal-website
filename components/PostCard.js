@@ -7,7 +7,7 @@ import { AudioContext } from '../contexts/AudioContext';
 import remarkBreaks from 'remark-breaks';
 import { Menu, Transition } from '@headlessui/react';
 
-const PostCard = ({ title, subtitle, datePublished, category, description, content, tags, onTagClick, audioFile }) => {
+const PostCard = ({ title, subtitle, datePublished, category, description, content = '', tags, onTagClick, audioFile }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { playSong, addToQueue, addToUpNext } = useContext(AudioContext);
 
@@ -89,7 +89,7 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
   };
 
   // Check if there's additional content beyond the front matter
-  const hasAdditionalContent = content.trim() !== '';
+  const hasAdditionalContent = content && content.trim() !== '';
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 transition-all duration-300 ease-in-out hover:shadow-lg relative">
