@@ -53,25 +53,28 @@ export default function Home({ initialPosts, totalPosts }) {
   }, [page]);
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold mb-8">Welcome to My Blog</h1>
-      <div className="space-y-8"> {/* Changed to a vertical layout with space between cards */}
-        {filteredPosts.map((post, index) => (
-          <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
-            <PostCard 
-              title={post.title}
-              subtitle={post.subtitle}
-              datePublished={post.datePublished}
-              category={post.category}
-              description={post.description}
-              content={post.content || ''} // Ensure content is always a string
-              tags={post.tags}
-              audioFile={post.audioFile}
-            />
-          </div>
-        ))}
+    <div className="flex flex-col h-full">
+      <div className="h-14"></div> {/* This creates space equivalent to the sticky header */}
+      <div className="container mx-auto px-4 pt-4"> {/* Added pt-4 for top padding */}
+        <div className="space-y-8">
+          {filteredPosts.map((post, index) => (
+            <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
+              <PostCard 
+                title={post.title}
+                subtitle={post.subtitle}
+                datePublished={post.datePublished}
+                category={post.category}
+                description={post.description}
+                content={post.content || ''}
+                tags={post.tags}
+                audioFile={post.audioFile}
+                pinned={post.pinned} // Add this line
+              />
+            </div>
+          ))}
+        </div>
+        {loading && <p className="text-center mt-4">Loading more posts...</p>}
       </div>
-      {loading && <p className="text-center mt-4">Loading more posts...</p>}
     </div>
   );
 }

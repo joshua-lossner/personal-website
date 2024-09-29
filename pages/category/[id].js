@@ -115,6 +115,7 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
                     tags={post.tags || []}
                     onTagClick={handleTagClick}
                     audioFile={post.audioFile || ''}
+                    pinned={post.pinned} // Add this line
                   />
                 </div>
               ))
