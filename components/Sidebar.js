@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getCategoryIcon, categories } from '../utils/categories'
 import ThemeToggle from './ThemeToggle'
+// - import { FaHome } from 'react-icons/fa' // {{ edit_1 }} Remove unused FaHome import
 
 export default function Sidebar() {
   const router = useRouter()
@@ -17,7 +18,7 @@ export default function Sidebar() {
           <li key={category.id} onMouseEnter={() => prefetchCategory(category.id)}>
             <Link href={category.id === 'home' ? '/' : `/category/${category.id}`}>
               <span className="flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                {getCategoryIcon(category.id, '1.5em')}
+                {getCategoryIcon(category.iconName, '1em')} {/* {{ edit_2 }} */}
                 <span className="sr-only">{category.name}</span>
               </span>
             </Link>

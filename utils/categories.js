@@ -15,24 +15,24 @@ export function getCategories() {
   return categories;
 }
 
-export function getCategoryIcon(category, size = '1em') {
+export function getCategoryIcon(iconName, size = '1em') {
   const iconProps = { size };
-  switch (category.toLowerCase()) {
-    case 'home':
+  switch (iconName) {
+    case 'FaHome':
       return <FaHome {...iconProps} />;
-    case 'articles':
+    case 'FaNewspaper':
       return <FaNewspaper {...iconProps} />;
-    case 'blog':
+    case 'FaBlog':
       return <FaBlog {...iconProps} />;
-    case 'music':
+    case 'FaMusic':
       return <FaMusic {...iconProps} />;
-    case 'people':
+    case 'FaUsers':
       return <FaUsers {...iconProps} />;
-    case 'toolkit':
+    case 'FaToolbox':
       return <FaToolbox {...iconProps} />;
-    case 'education':
+    case 'FaGraduationCap':
       return <FaGraduationCap {...iconProps} />;
-    case 'notes':
+    case 'FaStickyNote':
       return <FaStickyNote {...iconProps} />;
     default:
       return null;

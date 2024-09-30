@@ -1,0 +1,9 @@
+.sidebar-icon {
+  font-size: 1em; /* Default size */
+}
+
+@media (max-width: 768px) {
+  .sidebar-icon {
+    font-size: 0.875em; /* Smaller size for mobile */
+  }
+}
