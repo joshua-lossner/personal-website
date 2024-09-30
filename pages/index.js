@@ -13,8 +13,10 @@ export default function Home({ initialPosts, totalPosts }) {
   const observer = useRef();
 
   const filterPostsForHomePage = useCallback((postsToFilter) => {
+    const allowedCategories = ['home', 'blog', 'articles']; // {{ edit_1 }} Define allowed categories
     return postsToFilter.filter(post => 
-      !(post.pinned && post.category.toLowerCase() !== 'home')
+      allowedCategories.includes(post.category.toLowerCase()) && // Check if category is allowed
+      (post.category.toLowerCase() === 'home' || !post.pinned) // {{ edit_2 }} Exclude pinned posts from 'blog' and 'articles'
     );
   }, []);
 
@@ -68,7 +70,7 @@ export default function Home({ initialPosts, totalPosts }) {
                 content={post.content || ''}
                 tags={post.tags}
                 audioFile={post.audioFile}
-                pinned={post.pinned} // Add this line
+                pinned={post.pinned} // Ensure pinned status is passed correctly
               />
             </div>
           ))}
