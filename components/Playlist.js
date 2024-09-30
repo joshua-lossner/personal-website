@@ -9,7 +9,7 @@ const Playlist = () => {
       <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-200">Playlist</h2>
       {playlist.length > 0 ? (
         <ul>
-          {playlist.map((track, index) => (
+          {playlist.slice(0, 10).map((track, index) => ( // Limit to 10 songs
             <li 
               key={track.id || index} 
               className={`cursor-pointer mb-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white ${index === currentTrack ? 'font-bold' : ''}`}

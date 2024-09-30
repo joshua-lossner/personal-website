@@ -201,10 +201,10 @@ const DynamicMusicPlayerContent = () => {
       </div>
 
       {showPlaylist && playlist.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-4 max-h-60 overflow-y-auto relative"> {/* Add max-h-60, overflow-y-auto, and relative */}
           <h3 className="text-sm font-semibold mb-2">Playlist</h3>
           <ul className="text-xs text-gray-600 dark:text-gray-400">
-            {playlist.map((track, index) => (
+            {playlist.map((track, index) => ( /* Remove the slice(0, 10) limitation */
               <li 
                 key={index}
                 className={`cursor-pointer p-2 rounded ${index === currentTrack ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
@@ -214,6 +214,7 @@ const DynamicMusicPlayerContent = () => {
               </li>
             ))}
           </ul>
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none"></div> {/* Add gradient overlay */}
         </div>
       )}
 

@@ -244,7 +244,7 @@ const DynamicMusicPlayer = () => {
       </div>
       
       {showPlaylist && playlist.length > 0 && (
-        <div className="mt-4 w-full">
+        <div className="mt-4 w-full max-h-60 overflow-y-auto relative"> {/* Add max-h-60, overflow-y-auto, and relative */}
           <h3 className="text-sm font-semibold mb-2">Now Playing</h3>
           <ul className="text-xs text-gray-600 dark:text-gray-400">
             {playlist.map((track, index) => (
@@ -257,6 +257,7 @@ const DynamicMusicPlayer = () => {
               </li>
             ))}
           </ul>
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none"></div> {/* Add gradient overlay */}
         </div>
       )}
 

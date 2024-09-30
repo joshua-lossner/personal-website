@@ -310,3 +310,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Remove any conflicting styles for nav ul and nav ul li */
+
+/* Add this to your globals.css file */
+.max-h-60 {
+  max-height: 15rem; /* 60 * 0.25rem */
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}

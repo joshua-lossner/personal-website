@@ -7,6 +7,7 @@ const nextConfig = {
   publicRuntimeConfig: {
     S3_BASE_URL_ALBUMS: process.env.NEXT_PUBLIC_S3_BASE_URL_ALBUMS,
   },
+  // Remove the eslint.ignoreDuringBuilds option
 };
 
 export default nextConfig;
