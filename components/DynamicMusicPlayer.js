@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaRandom, FaRedo, FaList, FaBroadcastTower } from 'react-icons/fa';
 import { AudioContext } from '../contexts/AudioContext';
 import ReactMarkdown from 'react-markdown';
@@ -34,6 +34,8 @@ const DynamicMusicPlayer = () => {
   const [showRadioStations, setShowRadioStations] = useState(true);
   const [error, setError] = useState(null);
   const [albumArtUrl, setAlbumArtUrl] = useState(null);
+  const [isPlaylistScrollable, setIsPlaylistScrollable] = useState(false);
+  const playlistRef = useRef(null);
 
   useEffect(() => {
     setShowRadioStations(true);
@@ -101,6 +103,12 @@ const DynamicMusicPlayer = () => {
   useEffect(() => {
     console.log('S3_BASE_URL_ALBUMS:', S3_BASE_URL_ALBUMS);
   }, [S3_BASE_URL_ALBUMS]);
+
+  useEffect(() => {
+    if (playlistRef.current) {
+      setIsPlaylistScrollable(playlistRef.current.scrollHeight > playlistRef.current.clientHeight);
+    }
+  }, [playlist, showPlaylist]);
 
   const formatSongTitle = (title) => {
     return title ? title.replace(/\.(mp3|wav|ogg)$/, '') : 'Choose Vibe Below';
@@ -244,20 +252,29 @@ const DynamicMusicPlayer = () => {
       </div>
       
       {showPlaylist && playlist.length > 0 && (
-        <div className="mt-4 w-full max-h-60 overflow-y-auto relative"> {/* Add max-h-60, overflow-y-auto, and relative */}
+        <div className="mt-4 w-full relative">
           <h3 className="text-sm font-semibold mb-2">Now Playing</h3>
-          <ul className="text-xs text-gray-600 dark:text-gray-400">
-            {playlist.map((track, index) => (
-              <li 
-                key={index}
-                className={`cursor-pointer p-2 rounded ${index === currentTrack ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                onClick={() => setCurrentTrack(index)}
-              >
-                {formatSongTitle(track.title)}
-              </li>
-            ))}
-          </ul>
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none"></div> {/* Add gradient overlay */}
+          <div 
+            ref={playlistRef}
+            className="max-h-60 overflow-y-auto pr-2 relative"
+          >
+            <ul className="text-xs text-gray-600 dark:text-gray-400">
+              {playlist.map((track, index) => (
+                <li 
+                  key={index}
+                  className={`cursor-pointer p-2 rounded ${index === currentTrack ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                  onClick={() => setCurrentTrack(index)}
+                >
+                  {formatSongTitle(track.title)}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {isPlaylistScrollable && (
+            <div className="text-center text-gray-500 mt-2">
+              <span className="inline-block animate-bounce">▼</span>
+            </div>
+          )}
         </div>
       )}
 
