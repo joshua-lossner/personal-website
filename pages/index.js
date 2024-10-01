@@ -56,9 +56,8 @@ export default function Home({ initialPosts, totalPosts }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="h-14"></div> {/* This creates space equivalent to the sticky header */}
-      <div className="container mx-auto px-4 pt-4">
-        <div className="space-y-4 max-w-3xl mx-auto w-full fade-content"> {/* {{ edit_1 }} Removed p-4 to align padding with category pages */}
+      <div className="container mx-auto px-4">
+        <div className="space-y-4 max-w-3xl mx-auto w-full fade-content">
           {filteredPosts.map((post, index) => (
             <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
               <PostCard 

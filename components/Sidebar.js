@@ -1,33 +1,71 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useState, useEffect } from 'react'
 import { getCategoryIcon, categories } from '../utils/categories'
 import ThemeToggle from './ThemeToggle'
-// - import { FaHome } from 'react-icons/fa' // {{ edit_1 }} Remove unused FaHome import
+import { FaEllipsisH } from 'react-icons/fa'
 
 export default function Sidebar() {
-  const router = useRouter()
+  const [showSecondary, setShowSecondary] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
-  const prefetchCategory = (id) => {
-    router.prefetch(`/category/${id}`)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const mainCategories = ['home', 'blog', 'articles']
+  const secondaryCategories = categories.filter(cat => !mainCategories.includes(cat.id))
+
+  const toggleSecondary = () => {
+    setShowSecondary(!showSecondary)
   }
 
+  const renderCategoryLink = (category) => (
+    <li key={category.id} className="md:mb-4">
+      <Link href={category.id === 'home' ? '/' : `/category/${category.id}`}>
+        <span className="flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+          {getCategoryIcon(category.iconName, '1.5em')}
+          <span className="sr-only">{category.name}</span>
+        </span>
+      </Link>
+    </li>
+  )
+
   return (
-    <nav className="bg-gray-200 dark:bg-gray-800 md:w-20 md:h-full md:flex-shrink-0 fixed md:static top-0 left-0 right-0 z-40">
+    <nav className="bg-gray-200 dark:bg-gray-800 md:w-20 md:h-full md:flex-shrink-0 fixed top-0 left-0 right-0 md:top-0 z-40">
       <ul className="flex md:flex-col items-center justify-around md:justify-start md:space-y-8 p-4 md:pt-8">
-        {categories.map((category) => (
-          <li key={category.id} onMouseEnter={() => prefetchCategory(category.id)}>
-            <Link href={category.id === 'home' ? '/' : `/category/${category.id}`}>
-              <span className="flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                {getCategoryIcon(category.iconName, '1em')} {/* {{ edit_2 }} */}
-                <span className="sr-only">{category.name}</span>
-              </span>
-            </Link>
-          </li>
+        {/* All categories for desktop, main categories for mobile */}
+        {categories.map(category => (
+          isMobile ? 
+            (mainCategories.includes(category.id) && renderCategoryLink(category)) :
+            renderCategoryLink(category)
         ))}
+
+        {/* Ellipsis button - visible only on small screens */}
+        {isMobile && (
+          <li>
+            <button onClick={toggleSecondary} className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              <FaEllipsisH size="1.5em" />
+            </button>
+          </li>
+        )}
+
+        {/* Theme toggle - always visible at the bottom */}
         <li className="md:mt-auto">
           <ThemeToggle />
         </li>
       </ul>
+
+      {/* Secondary menu for small screens */}
+      {isMobile && showSecondary && (
+        <div className="fixed top-16 left-0 right-0 bg-gray-200 dark:bg-gray-800 p-4">
+          <ul className="flex justify-around">
+            {secondaryCategories.map(renderCategoryLink)}
+          </ul>
+        </div>
+      )}
     </nav>
   )
 }

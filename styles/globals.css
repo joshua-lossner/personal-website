@@ -287,9 +287,9 @@ input[type="range"]::-moz-range-thumb {
 
 /* Add these styles at the end of your globals.css file */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   nav {
-    height: 4rem; /* Set a fixed height for the mobile nav */
+    height: 4rem;
   }
 
   nav ul {
@@ -301,12 +301,12 @@ input[type="range"]::-moz-range-thumb {
   nav ul li {
     margin-bottom: 0;
   }
+}
 
-  /* Remove this class as we're handling padding in the Layout component
-  .content-area {
-    padding-top: 4rem;
+@media (min-width: 768px) {
+  .md\:pl-20 {
+    padding-left: 5rem;
   }
-  */
 }
 
 /* Remove any conflicting styles for nav ul and nav ul li */
@@ -317,4 +317,80 @@ input[type="range"]::-moz-range-thumb {
 }
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.secondary-menu-enter {
+  transform: translateY(100%);
+}
+.secondary-menu-enter-active {
+  transform: translateY(0);
+  transition: transform 300ms ease-in;
+}
+.secondary-menu-exit {
+  transform: translateY(0);
+}
+.secondary-menu-exit-active {
+  transform: translateY(100%);
+  transition: transform 300ms ease-in;
+}
+
+/* Add these styles to your globals.css file */
+
+@media (min-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+
+  .md\:pl-20 {
+    padding-left: 5rem;
+  }
+}
+
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.7) transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.7);
+  border-radius: 3px;
+  border: transparent;
+}
+
+/* Add these styles to your globals.css file */
+
+.main-content {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.main-content::-webkit-scrollbar {
+  width: 0px; /* For Chrome, Safari, and Opera */
+}
+
+.main-content:hover {
+  scrollbar-width: thin; /* For Firefox */
+  -ms-overflow-style: auto; /* For Internet Explorer and Edge */
+}
+
+.main-content:hover::-webkit-scrollbar {
+  width: 6px; /* For Chrome, Safari, and Opera */
+}
+
+.main-content:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main-content:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.7);
+  border-radius: 3px;
+  border: transparent;
 }
