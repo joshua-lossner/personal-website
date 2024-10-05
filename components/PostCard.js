@@ -93,9 +93,11 @@ const PostCard = ({ title, subtitle, datePublished, category, description, conte
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 transition-all duration-300 ease-in-out hover:shadow-lg relative
-      ${pinned ? 'border-l-4 border-blue-500 bg-blue-50 dark:bg-gray-750 shadow-lg' : ''}`}>
+      ${pinned ? 'border-t-4 border-blue-500 pt-8' : ''}`}>
       {pinned && (
-        <FaThumbtack className="absolute top-2 right-2 text-blue-500 transform -rotate-45" />
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-500 rounded-full p-2">
+          <FaThumbtack className="text-white" />
+        </div>
       )}
       
       <AudioMenu />
