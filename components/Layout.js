@@ -27,7 +27,7 @@ export default function Layout({ children, categories }) {
     <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar categories={categories} />
       <main className="flex-grow md:pl-20 overflow-y-auto h-full main-content">
-        <div className="h-full overflow-y-auto pt-4 md:pt-6"> {/* Added padding top */}
+        <div className={`h-full overflow-y-auto ${isMobile ? 'mobile-top-padding' : 'pt-4 md:pt-6'}`}>
           {children}
         </div>
       </main>
@@ -51,4 +51,4 @@ export default function Layout({ children, categories }) {
       )}
     </div>
   );
-};
+}

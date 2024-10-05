@@ -394,3 +394,14 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 3px;
   border: transparent;
 }
+
+/* Add this to your existing styles */
+.mobile-top-padding {
+  padding-top: 4.75rem; /* Increased from 4.5rem to 4.75rem */
+}
+
+@media (min-width: 768px) {
+  .mobile-top-padding {
+    padding-top: 1.5rem; /* Keep this the same for desktop */
+  }
+}
