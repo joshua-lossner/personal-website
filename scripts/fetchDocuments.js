@@ -19,12 +19,18 @@ const localContentDir = path.join(process.cwd(), 'content');
 
 async function updateDatabase(post) {
   const db = await openDb();
-  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath } = post;
+  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath, published } = post;
   
-  await db.run(`
-    INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, hidden ? 1 : 0, filePath]);
+  if (published === true) {
+    console.log(`Inserting/updating published document: ${filePath}`);
+    await db.run(`
+      INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, hidden ? 1 : 0, filePath]);
+  } else {
+    console.log(`Removing unpublished document from database: ${filePath}`);
+    await db.run(`DELETE FROM posts WHERE filePath = ?`, [filePath]);
+  }
 }
 
 async function processFile(filePath, content) {
@@ -46,11 +52,13 @@ async function processFile(filePath, content) {
     filePath: filePath.replace(localContentDir, ''),
     content: markdownContent,
     audioFile: audioFilePath,
-    hidden: metadata.hidden || false, // Add this line
+    hidden: metadata.hidden || false,
+    published: metadata.published === true, // Explicitly check for true
   };
   
   console.log('Processing file:', filePath);
   console.log('Metadata:', metadata);
+  console.log('Published status:', post.published);
   
   await fs.writeFile(path.join(localContentDir, filePath), content);
   await updateDatabase(post);
@@ -99,7 +107,9 @@ async function fetchAndStoreDocuments() {
       const content = await fetchFileContent(file.path);
       const { data, content: markdownContent } = matter(content);
       
-      // Check if the document is published
+      console.log(`Processing ${file.path}. Published status: ${data.published}`);
+
+      // Only process if explicitly published
       if (data.published === true) {
         // Ensure all required fields are present
         const requiredFields = ['title', 'category', 'description', 'datePublished'];
@@ -145,9 +155,12 @@ async function fetchAndStoreDocuments() {
         console.log(`Stored and processed: ${file.path} (Category: ${data.category})`);
       } else {
         console.log(`Skipped unpublished document: ${file.path}`);
+        // Remove from database if it exists
+        const db = await openDb();
+        await db.run(`DELETE FROM posts WHERE filePath = ?`, [file.path]);
       }
     }
-    console.log('All published documents fetched, stored, and processed successfully.');
+    console.log('All documents processed successfully.');
   } catch (error) {
     console.error('Error fetching and storing documents:', error.message);
     if (error.response) {

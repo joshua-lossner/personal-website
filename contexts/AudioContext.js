@@ -15,10 +15,8 @@ export const AudioProvider = ({ children }) => {
     { id: 1, name: "Electric Daydreams", tag: "electric-chill" },
     { id: 2, name: "Ivory Reverie", tag: "classic-piano" },
     { id: 3, name: "Velvet Vibes", tag: "soft-jazz" },
-    { id: 4, name: "Spirit of the Radio", tag: "prog-rock" },
-    { id: 5, name: "AltSoundwave", tag: "alternative" },
-    { id: 7, name: "Enter Sandman FM", tag: "hard-rock" },
-    { id: 6, name: "Podcast Wave", tag: "podcast-show" }, // Renamed and moved to the bottom
+    { id: 4, name: "Echoes of the Future", tag: "echoes-of-the-future" },
+    { id: 5, name: "Deep-Dive Podcast", tag: "deep-dive" }, // Renamed and moved to the bottom
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
   const [currentArtwork, setCurrentArtwork] = useState(null);
