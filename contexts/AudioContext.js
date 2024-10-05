@@ -266,7 +266,7 @@ export const AudioProvider = ({ children }) => {
     const station = radioStations.find(s => s.id === stationId);
     if (station) {
       try {
-        const response = await fetch(`/api/music-by-tag?tag=${station.tag}`);
+        const response = await fetch(`/api/audio-by-tag?tag=${station.tag}`);
         const data = await response.json();
         if (Array.isArray(data.playlist) && data.playlist.length > 0) {
           console.log('Loaded radio station playlist:', data.playlist);
