@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react'
 import { getCategoryIcon, categories } from '../utils/categories'
 import ThemeToggle from './ThemeToggle'
 import { FaEllipsisH } from 'react-icons/fa'
+import { useRouter } from 'next/router'
 
 export default function Sidebar() {
   const [showSecondary, setShowSecondary] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -14,6 +16,11 @@ export default function Sidebar() {
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  useEffect(() => {
+    // Close the secondary menu when the route changes
+    setShowSecondary(false)
+  }, [router.asPath])
 
   const mainCategories = ['home', 'blog', 'articles']
   const secondaryCategories = categories.filter(cat => !mainCategories.includes(cat.id))
