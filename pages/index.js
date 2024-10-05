@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Head from 'next/head'; // Add this import
 import { getSortedPostsData } from '../lib/posts';
 import PostCard from '../components/PostCard';
 
@@ -55,9 +56,14 @@ export default function Home({ initialPosts, totalPosts }) {
   }, [page]);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="container mx-auto px-4">
-        <div className="space-y-4 max-w-3xl mx-auto w-full fade-content">
+    <>
+      <Head>
+        <title>Joshua C. Lossner</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8"> {/* Added max-width and padding */}
+        <div className="space-y-4">
           {filteredPosts.map((post, index) => (
             <div key={post.id} ref={index === filteredPosts.length - 1 ? lastPostElementRef : null}>
               <PostCard 
@@ -73,10 +79,11 @@ export default function Home({ initialPosts, totalPosts }) {
               />
             </div>
           ))}
+          {loading && <p className="text-center mt-4">Loading more posts...</p>}
+          {!hasMore && <p className="text-center mt-4">No more posts to load</p>}
         </div>
-        {loading && <p className="text-center mt-4">Loading more posts...</p>}
       </div>
-    </div>
+    </>
   );
 }
 

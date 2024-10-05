@@ -84,28 +84,26 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <Head>
         <title>{`${categoryData.name} - Joshua C. Lossner`}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900">
-        {activeTag && (
-          <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-            <span className="text-sm md:text-base">Showing posts tagged with: {activeTag}</span>
-            <button 
-              onClick={() => handleTagClick(activeTag)} 
-              className="ml-2 text-sm md:text-base text-blue-600 dark:text-blue-300 hover:underline"
-            >
-              Clear filter
-            </button>
-          </div>
-        )}
-      </div>
+      {activeTag && (
+        <div className="sticky top-0 z-10 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+          <span className="text-sm md:text-base">Showing posts tagged with: {activeTag}</span>
+          <button 
+            onClick={() => handleTagClick(activeTag)} 
+            className="ml-2 text-sm md:text-base text-blue-600 dark:text-blue-300 hover:underline"
+          >
+            Clear filter
+          </button>
+        </div>
+      )}
 
-      <div className="flex-grow overflow-y-auto">
-        <div className="p-4 space-y-4 max-w-3xl mx-auto w-full fade-content">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8"> {/* Added max-width and padding */}
+        <div className="space-y-4">
           {posts && posts.length > 0 ? (
             posts
               .sort((a, b) => {
@@ -125,18 +123,18 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
                     tags={post.tags || []}
                     onTagClick={handleTagClick}
                     audioFile={post.audioFile || ''}
-                    pinned={post.pinned} // Add this line
+                    pinned={post.pinned}
                   />
                 </div>
               ))
           ) : (
             <p className="text-gray-600 dark:text-gray-400">No posts available in this category.</p>
           )}
-          {loading && <p className="text-center">Loading more posts...</p>}
-          {!hasMore && <p className="text-center">No more posts to load</p>}
+          {loading && <p className="text-center mt-4">Loading more posts...</p>}
+          {!hasMore && <p className="text-center mt-4">No more posts to load</p>}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
