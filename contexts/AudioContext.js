@@ -15,7 +15,7 @@ export const AudioProvider = ({ children }) => {
     { id: 1, name: "Electric Daydreams", tag: "electric-chill" },
     { id: 2, name: "Ivory Reverie", tag: "classic-piano" },
     { id: 3, name: "Velvet Vibes", tag: "soft-jazz" },
-    { id: 4, name: "Echoes of the Future", tag: "echoes-of-the-future" },
+    { id: 4, name: "Echoes of Tomorrow", tag: "echoes-of-tomorrow" },
     { id: 5, name: "Deep-Dive Podcast", tag: "deep-dive" }, // Renamed and moved to the bottom
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
