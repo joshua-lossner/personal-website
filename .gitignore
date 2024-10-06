@@ -51,6 +51,5 @@ Thumbs.db
 # Since you're not storing anything in the public folder, we'll ignore it entirely
 /public/
 
-# Scripts
-# Commented out as requested, assuming it doesn't contain sensitive information
-# scripts/fetch-documents.js
+# AI Consultation Documents
+consults/

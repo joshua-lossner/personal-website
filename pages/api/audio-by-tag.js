@@ -26,8 +26,11 @@ export default async function handler(req, res) {
 
     res.status(200).json({ playlist });
   } catch (error) {
+    // Log the detailed error on the server
     console.error('Error fetching audio by tag:', error);
-    res.status(500).json({ error: 'Failed to fetch audio by tag' });
+
+    // Send a generic error message to the client
+    res.status(500).json({ error: 'An unexpected error occurred while fetching audio' });
   }
 }
 
