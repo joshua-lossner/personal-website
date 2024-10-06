@@ -1,21 +1,12 @@
-// Remove any imports related to Clock
+// Remove any imports related to Clock if they exist
+// For example: import Clock from './Clock';
 
-// If RightPanel is not used elsewhere, you can remove this entire function
-// function RightPanel() {
-//   return (
-//     <div className="right-panel">
-//       {/* Other right panel content */}
-//     </div>
-//   );
-// }
-
-// Your main Layout component (if it exists)
+// Your main Layout component
 export default function Layout({ children }) {
   return (
     <div className="layout">
-      {/* Your layout structure */}
       <main>{children}</main>
-      {/* You can add other layout elements here */}
+      {/* Add other layout elements here if needed */}
     </div>
   );
 }
