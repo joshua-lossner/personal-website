@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+
 # Testing
 /coverage
 
@@ -25,6 +26,7 @@ yarn-error.log*
 
 # Local env files
 .env*.local
+!.env.example
 
 # Vercel
 .vercel
@@ -40,14 +42,15 @@ next-env.d.ts
 *.log
 
 # OS generated files
-Thumbs.db/public
+Thumbs.db
 
 # Database 
-posts.db 
+*.db 
 
-# Ignore public folder except audio
+# Public folder
+# Since you're not storing anything in the public folder, we'll ignore it entirely
 /public/
-!/public/audio/
 
-# Add this line to your .gitignore file
-scripts/fetch-documents.js
+# Scripts
+# Commented out as requested, assuming it doesn't contain sensitive information
+# scripts/fetch-documents.js
