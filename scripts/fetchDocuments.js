@@ -20,13 +20,13 @@ const localContentDir = path.join(process.cwd(), 'content');
 
 async function updateDatabase(post) {
   const db = await openDb();
-  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath, published, artwork } = post;
+  const { title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath, published } = post;
   
   if (published === true) {
     await db.run(`
-      INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath, artwork)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, hidden ? 1 : 0, filePath, artwork]);
+      INSERT OR REPLACE INTO posts (title, subtitle, category, description, tags, datePublished, narration, audioFile, pinned, hidden, filePath)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [title, subtitle, category, description, JSON.stringify(tags), datePublished, narration, audioFile, pinned ? 1 : 0, hidden ? 1 : 0, filePath]);
   } else {
     await db.run(`DELETE FROM posts WHERE filePath = ?`, [filePath]);
   }
