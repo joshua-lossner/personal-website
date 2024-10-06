@@ -3,16 +3,20 @@ import { openDb } from '../../lib/db';
 export default async function handler(req, res) {
   const { tag } = req.query;
 
-  if (!tag) {
-    return res.status(400).json({ error: 'Tag parameter is required' });
+  if (!tag || typeof tag !== 'string') {
+    return res.status(400).json({ error: 'Valid tag parameter is required' });
   }
 
   try {
     const db = await openDb();
+    
+    // Sanitize the tag input by escaping special characters
+    const sanitizedTag = tag.replace(/[%_\\]/g, '\\$&');
+
     const posts = await db.all(
       `SELECT title, audioFile FROM posts 
-       WHERE tags LIKE ? AND audioFile IS NOT NULL`,
-      [`%${tag}%`]
+       WHERE tags LIKE ? ESCAPE '\\' AND audioFile IS NOT NULL`,
+      [`%${sanitizedTag}%`]
     );
 
     const playlist = posts.map(post => ({

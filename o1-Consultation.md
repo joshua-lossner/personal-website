@@ -160,27 +160,36 @@ Based on your provided codebase, here are some suggestions for cleanup and poten
      // console.log('GitHub Token:', process.env.GITHUB_TOKEN ? 'Set' : 'Not set');
      ```
 
-3. **Path Traversal Vulnerability**:
+3. **Path Traversal Vulnerability**: RESOLVED
 
    - **File**: `pages/api/music.js`
-   - **Issue**: User input (`directory` query parameter) is used to construct file paths without proper validation.
-   - **Risk**: Malicious users could access unauthorized files via directory traversal attacks.
-   - **Suggestion**: Validate and sanitize the `directory` parameter to ensure it only allows expected values.
+   - **Issue**: User input (`directory` query parameter) was used to construct file paths without proper validation.
+   - **Resolution**: Implemented proper sanitization and validation of the `directory` parameter.
 
      ```javascript
      // pages/api/music.js
      import path from 'path';
+     import fs from 'fs/promises';
      
      export default async function handler(req, res) {
        const { directory } = req.query;
-       const allowedDirectories = ['genre1', 'genre2', 'genre3']; // Define allowed directories
        
-       if (!allowedDirectories.includes(directory)) {
-         return res.status(400).json({ error: 'Invalid directory' });
+       if (!directory) {
+         return res.status(400).json({ error: 'Missing directory parameter' });
+       }
+
+       // Sanitize the directory parameter to prevent path traversal
+       const sanitizedDirectory = path.normalize(directory).replace(/^(\.\.(\/|\\|$))+/, '');
+       const musicBaseDir = path.join(process.cwd(), 'content', 'Artifacts', 'Music');
+       const playlistDirectory = path.join(musicBaseDir, sanitizedDirectory);
+
+       // Ensure the resulting path is still within the Music directory
+       if (!playlistDirectory.startsWith(musicBaseDir)) {
+         console.warn(`Invalid directory access attempt: ${directory}`);
+         return res.status(400).json({ error: 'Invalid directory parameter' });
        }
        
-       const playlistDirectory = path.join(process.cwd(), 'public', 'audio', 'site-playlist', directory);
-       // Proceed with reading files
+       // Proceed with reading files...
      }
      ```
 
