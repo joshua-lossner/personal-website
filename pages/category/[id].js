@@ -19,8 +19,6 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
 
   useEffect(() => {
     if (router.query.id) {
-      console.log('Category changed:', router.query.id);
-      console.log('Initial posts:', initialPosts);
       setCategory(router.query.id);
       setPosts(initialPosts);
       setPage(1);
@@ -47,7 +45,6 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
         const res = await fetch(`/api/posts?category=${category}&page=${page}&limit=${POSTS_PER_PAGE}`);
         const newPosts = await res.json();
         
-        // Sort the new posts
         const sortedNewPosts = newPosts.sort((a, b) => {
           if (a.pinned && !b.pinned) return -1;
           if (!a.pinned && b.pinned) return 1;
@@ -102,7 +99,7 @@ export default function Category({ initialCategory, initialPosts, totalPosts }) 
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8"> {/* Added max-width and padding */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-4">
           {posts && posts.length > 0 ? (
             posts
@@ -151,19 +148,13 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const category = params.id === 'home' ? null : params.id;
-  console.log('Fetching posts for category:', category);
   const { posts, totalPosts } = await getSortedPostsData(category, 1, POSTS_PER_PAGE);
 
-  console.log('Fetched posts:', posts);
-
-  // Sort the posts again on the server side to ensure correct order
   const sortedPosts = posts.sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
     return new Date(b.datePublished) - new Date(a.datePublished);
   });
-
-  console.log('Sorted posts:', sortedPosts);
 
   return {
     props: {

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useState, useRef, useEffect, useCallback } from 'react';
 
 export const AudioContext = createContext();
 
@@ -20,8 +20,6 @@ export const AudioProvider = ({ children }) => {
   ]);
   const [currentRadioStation, setCurrentRadioStation] = useState(null);
   const [currentArtwork, setCurrentArtwork] = useState(null);
-
-  console.log('S3_BASE_URL_ALBUMS in AudioContext:', process.env.S3_BASE_URL_ALBUMS);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
