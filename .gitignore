@@ -48,3 +48,6 @@ posts.db
 # Ignore public folder except audio
 /public/
 !/public/audio/
+
+# Add this line to your .gitignore file
+scripts/fetch-documents.js
