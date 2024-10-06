@@ -11,6 +11,11 @@ const githubUsername = process.env.GITHUB_USERNAME;
 const githubRepo = process.env.GITHUB_REPO;
 const githubToken = process.env.GITHUB_TOKEN;
 
+if (!githubUsername || !githubRepo || !githubToken) {
+  console.error('Missing required environment variables. Please check your .env.local file.');
+  process.exit(1);
+}
+
 const localContentDir = path.join(process.cwd(), 'content');
 
 async function updateDatabase(post) {
