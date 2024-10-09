@@ -1,22 +1,22 @@
-const fs = require('fs');
-const path = require('path');
+import { getSortedPostsData } from '../lib/posts';
+import { handleApiError } from '../utils/apiErrorHandler';
 
-router.get('/posts', async (req, res) => {
+export default async function handler(req, res) {
   try {
-    const posts = await Post.findAll({
-      where: {
-        hidden: false
-      }
-    });
-    const logPath = path.join(__dirname, 'posts.log');
-    const logData = {
-      timestamp: new Date().toISOString(),
-      query: { hidden: false },
-      result: posts
-    };
-    fs.appendFileSync(logPath, JSON.stringify(logData, null, 2) + '\n'); // Log the posts to a file
-    res.json(posts);
+    const posts = await getSortedPostsData();
+    const visiblePosts = posts.filter(post => !post.hidden);
+    res.status(200).json(visiblePosts);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch posts' });
+    handleApiError(res, error, 'Failed to fetch posts');
   }
-});
+}
+
+export async function getArticles(req, res) {
+  try {
+    const posts = await getSortedPostsData();
+    const visiblePosts = posts.filter(post => !post.hidden);
+    res.status(200).json(visiblePosts);
+  } catch (error) {
+    handleApiError(res, error, 'Failed to fetch articles');
+  }
+}
